@@ -5,7 +5,7 @@ import { MessageCircle, Mail, Video, ShieldCheck } from 'lucide-react';
 export const Footer = () => {
   const whatsappUrl =
     import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
-    'https://wa.me/919999999999';
+    'https://wa.me/917042858524';
 
   return (
     <footer className="border-t border-brand-border bg-brand-card/60 text-brand-muted">
@@ -85,7 +85,7 @@ export const Footer = () => {
                   className="flex items-center gap-2 text-brand-emerald hover:underline"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  Chat on WhatsApp
+                  <span>WhatsApp: +91 70428 58524</span>
                 </a>
               </li>
               <li>

@@ -57,7 +57,7 @@ const env = parsed.success ? parsed.data : {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1d',
   ADMIN_USERNAME: process.env.ADMIN_USERNAME || 'admin',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'AdminPassword123!',
-  WHATSAPP_CONTACT_URL: process.env.WHATSAPP_CONTACT_URL || 'https://wa.me/919999999999',
+  WHATSAPP_CONTACT_URL: process.env.WHATSAPP_CONTACT_URL || 'https://wa.me/917042858524',
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
   SMTP_USER: process.env.SMTP_USER,

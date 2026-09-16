@@ -55,7 +55,10 @@ export const PaymentFailedPage = () => {
           <p className="text-xs text-brand-muted mb-3">
             Need urgent assistance or want to pay via direct bank transfer?
           </p>
-          <WhatsAppButton text="Chat with Kush on WhatsApp" />
+          <WhatsAppButton
+            text="Chat with Kush on WhatsApp (+91 70428 58524)"
+            url={`https://wa.me/917042858524?text=${encodeURIComponent(`Hi Kush, my payment encountered an issue (Ref: ${orderRef || ''}). Can you assist me?`)}`}
+          />
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from './Button';
-import { Menu, X, Shield, User, LogOut, ChevronDown, Dumbbell } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, ChevronDown, Dumbbell, MessageCircle } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -71,7 +71,18 @@ export const Navbar = () => {
         </nav>
 
         {/* Auth / Action CTA */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
+          <a
+            href="https://wa.me/917042858524"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 text-xs font-semibold transition-all duration-200"
+            title="Chat directly on WhatsApp"
+          >
+            <MessageCircle className="w-3.5 h-3.5 fill-current" />
+            <span>WhatsApp</span>
+          </a>
+
           {isAuthenticated ? (
             <div className="relative">
               <button
@@ -131,6 +142,15 @@ export const Navbar = () => {
 
         {/* Mobile Hamburger Toggle */}
         <div className="flex md:hidden items-center gap-3">
+          <a
+            href="https://wa.me/917042858524"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 text-xs font-semibold"
+            title="Chat directly on WhatsApp"
+          >
+            <MessageCircle className="w-3.5 h-3.5 fill-current" />
+          </a>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-2 text-brand-muted hover:text-white rounded-lg bg-brand-card border border-brand-border"
@@ -165,6 +185,17 @@ export const Navbar = () => {
               Admin Portal
             </Link>
           )}
+
+          <a
+            href="https://wa.me/917042858524"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileOpen(false)}
+            className="flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold rounded-lg bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 hover:bg-[#25D366]/25 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4 fill-current" />
+            Chat on WhatsApp (+91 70428 58524)
+          </a>
 
           <div className="pt-4 border-t border-brand-border flex flex-col gap-2.5">
             {isAuthenticated ? (

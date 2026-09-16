@@ -139,7 +139,8 @@ export const PaymentSuccessPage = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <WhatsAppButton
-              text="Message Kush to Start Training"
+              text="Message Kush to Start Training (+91 70428 58524)"
+              url={`https://wa.me/917042858524?text=${encodeURIComponent(`Hi Kush, I just completed my coaching booking! Order ID: ${data?.orderId || ''}`)}`}
               className="w-full text-center"
             />
             {data?.orderId && (

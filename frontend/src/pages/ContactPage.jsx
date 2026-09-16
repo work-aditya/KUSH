@@ -73,6 +73,23 @@ export const ContactPage = () => {
             <WhatsAppButton text="Chat with Kush on WhatsApp" className="w-full" />
 
             <div className="pt-6 border-t border-brand-border/60 space-y-4">
+              <a
+                href="https://wa.me/917042858524"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-4 group cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] shrink-0 group-hover:bg-[#25D366]/25 transition-colors">
+                  <MessageCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-white group-hover:text-[#25D366] transition-colors">
+                    Direct WhatsApp
+                  </h4>
+                  <p className="text-xs text-brand-emerald font-medium">+91 70428 58524</p>
+                </div>
+              </a>
+
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-brand-accent shrink-0">
                   <Mail className="w-5 h-5" />

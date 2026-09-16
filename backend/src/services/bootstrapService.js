@@ -100,7 +100,7 @@ const bootstrapAdmin = async () => {
       await User.create({
         name: 'Coach Kush (Admin)',
         email: adminEmail,
-        phone: '+919999999999',
+        phone: '+917042858524',
         passwordHash,
         role: 'admin',
         active: true,
