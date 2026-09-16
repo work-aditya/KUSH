@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "description": "CoachKush - Master Production Full-Stack Online Coaching Platform",
   "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "dev:backend": "npm --prefix backend run dev",
-    "dev:frontend": "npm --prefix \"kush(frontend)\" run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "build:frontend": "npm --prefix \"kush(frontend)\" run build",
+    "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
     "build": "npm run build:frontend",
     "test:backend": "npm --prefix backend test",
-    "test:frontend": "npm --prefix \"kush(frontend)\" test",
+    "test:frontend": "npm --prefix frontend test",
     "test": "npm run test:backend",
     "seed": "npm --prefix backend run seed",
-    "lint:frontend": "npm --prefix \"kush(frontend)\" run lint",
+    "lint:frontend": "npm --prefix frontend run lint",
     "lint:backend": "npm --prefix backend run lint"
   },
   "devDependencies": {
