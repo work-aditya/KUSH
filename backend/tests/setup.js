@@ -14,17 +14,22 @@ let mongoServer;
 
 const setupTestDB = () => {
   beforeAll(async () => {
-
     try {
-      mongoServer = await MongoMemoryServer.create();
+      if (!mongoServer) {
+        mongoServer = await MongoMemoryServer.create();
+      }
       const uri = mongoServer.getUri();
-      await mongoose.connect(uri);
+      if (mongoose.connection.readyState === 0) {
+        await mongoose.connect(uri);
+      }
     } catch (err) {
       console.warn('MongoMemoryServer initialization fallback to local test DB:', err.message);
       const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/coachkush_test';
-      await mongoose.connect(uri);
+      if (mongoose.connection.readyState === 0) {
+        await mongoose.connect(uri);
+      }
     }
-  });
+  }, 120000);
 
   afterEach(async () => {
     if (mongoose.connection.readyState === 1) {
@@ -42,8 +47,9 @@ const setupTestDB = () => {
     }
     if (mongoServer) {
       await mongoServer.stop();
+      mongoServer = null;
     }
-  });
+  }, 60000);
 };
 
 module.exports = { setupTestDB };
