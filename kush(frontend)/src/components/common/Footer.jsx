@@ -32,7 +32,7 @@ export const Footer = () => {
               <span>•</span>
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-brand-emerald" />
-                PhonePe Secure Payments
+                Razorpay Secure Payments
               </span>
             </div>
           </div>
@@ -56,6 +56,11 @@ export const Footer = () => {
               <li>
                 <Link to="/pricing" className="hover:text-brand-accent transition-colors">
                   Membership & Pricing
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-brand-accent transition-colors">
+                  FAQ & Knowledge Base
                 </Link>
               </li>
               <li>

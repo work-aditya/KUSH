@@ -121,8 +121,8 @@ class InvoiceService {
           .font('Helvetica')
           .fillColor('#334155')
           .text(`Order ID: ${order.merchantTransactionId}`, 300, detailsTop + 18, { align: 'right' })
-          .text(`Provider: PhonePe`, 300, detailsTop + 32, { align: 'right' })
-          .text(`Transaction Ref: ${payment?.providerTransactionId || payment?.merchantTransactionId || 'Verified'}`, 300, detailsTop + 46, { align: 'right' });
+          .text(`Provider: ${order.provider || 'Razorpay'}`, 300, detailsTop + 32, { align: 'right' })
+          .text(`Transaction Ref: ${payment?.providerTransactionId || payment?.razorpayPaymentId || payment?.merchantTransactionId || 'Verified'}`, 300, detailsTop + 46, { align: 'right' });
 
         // Table Header
         const tableTop = 230;
@@ -141,6 +141,7 @@ class InvoiceService {
 
         // Table Content
         const itemTop = tableTop + 35;
+        const displayBasePrice = order.originalAmount || pricing.price || order.amount;
         doc
           .fillColor('#1E293B')
           .font('Helvetica-Bold')
@@ -158,7 +159,7 @@ class InvoiceService {
           .fontSize(10)
           .text(pricing.duration || '1 Month', 280, itemTop)
           .text(`${pricing.sessions || 12} Sessions`, 380, itemTop)
-          .text(`₹${Number(order.amount).toLocaleString('en-IN')}`, 455, itemTop, { align: 'right' });
+          .text(`₹${Number(displayBasePrice).toLocaleString('en-IN')}`, 455, itemTop, { align: 'right' });
 
         // Table Bottom Divider
         doc
@@ -170,31 +171,47 @@ class InvoiceService {
 
         // Total Section
         const totalTop = itemTop + 45;
+        let runningY = totalTop;
+
         doc
           .fontSize(10)
           .font('Helvetica')
           .fillColor('#64748B')
-          .text('Subtotal:', 350, totalTop, { align: 'right' })
-          .text('Tax / GST (0% Included):', 350, totalTop + 16, { align: 'right' });
+          .text('Subtotal:', 350, runningY, { align: 'right' });
+        doc
+          .fillColor('#1E293B')
+          .text(`₹${Number(displayBasePrice).toLocaleString('en-IN')}`, 455, runningY, { align: 'right' });
+        runningY += 16;
+
+        if (order.discountAmount > 0) {
+          doc
+            .font('Helvetica-Bold')
+            .fillColor('#059669')
+            .text(`Coupon Discount (${order.couponCode || 'APPLIED'}):`, 300, runningY, { align: 'right' })
+            .text(`-₹${Number(order.discountAmount).toLocaleString('en-IN')}`, 455, runningY, { align: 'right' });
+          runningY += 16;
+        }
+
+        doc
+          .font('Helvetica')
+          .fillColor('#64748B')
+          .text('Tax / GST (0% Included):', 350, runningY, { align: 'right' });
+        doc
+          .fillColor('#1E293B')
+          .text('₹0', 455, runningY, { align: 'right' });
+        runningY += 20;
 
         doc
           .fontSize(12)
           .font('Helvetica-Bold')
           .fillColor('#0F172A')
-          .text('Total Paid:', 350, totalTop + 36, { align: 'right' });
-
-        doc
-          .fontSize(10)
-          .font('Helvetica')
-          .fillColor('#1E293B')
-          .text(`₹${Number(order.amount).toLocaleString('en-IN')}`, 455, totalTop, { align: 'right' })
-          .text('₹0', 455, totalTop + 16, { align: 'right' });
+          .text('Total Paid:', 350, runningY, { align: 'right' });
 
         doc
           .fontSize(12)
           .font('Helvetica-Bold')
           .fillColor('#059669')
-          .text(`₹${Number(order.amount).toLocaleString('en-IN')}`, 455, totalTop + 36, { align: 'right' });
+          .text(`₹${Number(order.amount).toLocaleString('en-IN')}`, 455, runningY, { align: 'right' });
 
         // Onboarding Instructions
         const noteTop = totalTop + 80;

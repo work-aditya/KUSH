@@ -49,7 +49,7 @@ export const AdminSettings = () => {
           <div className="p-4 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between">
             <div className="space-y-0.5">
               <p className="text-xs font-semibold text-white">Payment Gateway</p>
-              <p className="text-[11px] text-brand-muted">PhonePe PG Standard</p>
+              <p className="text-[11px] text-brand-muted">Razorpay PG Standard</p>
             </div>
             <Badge variant="accent">Active</Badge>
           </div>
@@ -90,7 +90,7 @@ export const AdminSettings = () => {
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>PhonePe webhook SHA256 checksum signature verification enforced.</span>
+            <span>Razorpay HMAC-SHA256 payment signature and webhook verification enforced.</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />

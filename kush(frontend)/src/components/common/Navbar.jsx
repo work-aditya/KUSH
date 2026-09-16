@@ -20,6 +20,7 @@ export const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About Kush', path: '/about' },
     { name: 'Pricing & Plans', path: '/pricing' },
+    { name: 'FAQ', path: '/faq' },
     { name: 'Contact', path: '/contact' },
   ];
 

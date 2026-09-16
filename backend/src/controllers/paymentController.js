@@ -2,7 +2,8 @@ const Order = require('../models/Order');
 const Payment = require('../models/Payment');
 const Pricing = require('../models/Pricing');
 const User = require('../models/User');
-const phonepeService = require('../services/phonepeService');
+const Coupon = require('../models/Coupon');
+const razorpayService = require('../services/razorpayService');
 const invoiceService = require('../services/invoiceService');
 const emailService = require('../services/emailService');
 const { sendSuccess, sendError } = require('../utils/response');
@@ -11,7 +12,7 @@ const logger = require('../config/logger');
 /**
  * Shared helper to mark order as paid, generate invoice, and dispatch email idempotently
  */
-const finalizeVerifiedPayment = async (order, providerTxnId, rawResponse) => {
+const finalizeVerifiedPayment = async (order, providerTxnId, rawResponse, rzpDetails = {}) => {
   if (order.status === 'paid') {
     return; // Idempotent: already processed
   }
@@ -20,13 +21,27 @@ const finalizeVerifiedPayment = async (order, providerTxnId, rawResponse) => {
   order.status = 'paid';
   await order.save();
 
+  // If order was discounted using a coupon, increment coupon redemption count
+  if (order.couponId) {
+    try {
+      await Coupon.findByIdAndUpdate(order.couponId, { $inc: { timesUsed: 1 } });
+      logger.info('Incremented coupon usage count', { couponCode: order.couponCode, couponId: order.couponId });
+    } catch (couponErr) {
+      logger.error('Failed to increment coupon usage count', { error: couponErr.message });
+    }
+  }
+
   // Create or update Payment record
   let payment = await Payment.findOne({ merchantTransactionId: order.merchantTransactionId });
   if (!payment) {
     payment = await Payment.create({
       orderId: order._id,
       merchantTransactionId: order.merchantTransactionId,
-      providerTransactionId: providerTxnId || 'VERIFIED',
+      provider: 'Razorpay',
+      providerTransactionId: providerTxnId || rzpDetails.razorpay_payment_id || 'VERIFIED',
+      razorpayPaymentId: rzpDetails.razorpay_payment_id,
+      razorpayOrderId: rzpDetails.razorpay_order_id || order.razorpayOrderId,
+      razorpaySignature: rzpDetails.razorpay_signature,
       amount: order.amount,
       status: 'SUCCESS',
       verified: true,
@@ -35,7 +50,11 @@ const finalizeVerifiedPayment = async (order, providerTxnId, rawResponse) => {
   } else {
     payment.status = 'SUCCESS';
     payment.verified = true;
+    payment.provider = 'Razorpay';
     payment.providerTransactionId = providerTxnId || payment.providerTransactionId;
+    payment.razorpayPaymentId = rzpDetails.razorpay_payment_id || payment.razorpayPaymentId;
+    payment.razorpayOrderId = rzpDetails.razorpay_order_id || payment.razorpayOrderId;
+    payment.razorpaySignature = rzpDetails.razorpay_signature || payment.razorpaySignature;
     payment.rawResponse = rawResponse;
     await payment.save();
   }
@@ -72,15 +91,78 @@ const finalizeVerifiedPayment = async (order, providerTxnId, rawResponse) => {
     }
   }
 
-  logger.info('Payment verified and order finalized successfully', {
+  logger.info('Payment verified and order finalized successfully with Razorpay', {
     orderId: order._id,
     merchantTransactionId: order.merchantTransactionId,
   });
 };
 
 /**
- * Check and verify payment status from PhonePe gateway
- * Never trust client payment status!
+ * Verify Razorpay payment signature from client checkout modal
+ */
+const verifyPayment = async (req, res, next) => {
+  try {
+    const { orderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    if (!orderId || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return sendError(res, 'MISSING_PAYMENT_DATA', 'Missing required Razorpay verification payload', 400);
+    }
+
+    const order = await Order.findById(orderId)
+      .populate('pricingId', 'title duration sessions planType')
+      .populate('userId', 'name email phone');
+
+    if (!order) {
+      return sendError(res, 'ORDER_NOT_FOUND', 'Coaching order not found', 404);
+    }
+
+    // IDOR Protection: Must be order owner or admin
+    if (order.userId._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return sendError(res, 'FORBIDDEN', 'Access denied to verify this order', 403);
+    }
+
+    // Cryptographic signature check
+    const isValidSignature = razorpayService.verifyPaymentSignature({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    });
+
+    if (!isValidSignature) {
+      logger.warn('Razorpay signature mismatch detected', {
+        orderId,
+        razorpay_order_id,
+        razorpay_payment_id,
+      });
+      return sendError(res, 'INVALID_SIGNATURE', 'Payment signature verification failed', 400);
+    }
+
+    await finalizeVerifiedPayment(
+      order,
+      razorpay_payment_id,
+      { razorpay_order_id, razorpay_payment_id, razorpay_signature },
+      { razorpay_order_id, razorpay_payment_id, razorpay_signature }
+    );
+
+    return sendSuccess(
+      res,
+      {
+        status: 'paid',
+        verified: true,
+        orderId: order._id,
+        merchantTransactionId: order.merchantTransactionId,
+        amount: order.amount,
+        planTitle: order.pricingId?.title,
+      },
+      'Payment verified and membership activated'
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Check payment status by merchantTransactionId
  */
 const getPaymentStatus = async (req, res, next) => {
   try {
@@ -99,52 +181,13 @@ const getPaymentStatus = async (req, res, next) => {
       return sendError(res, 'FORBIDDEN', 'Access denied to payment status', 403);
     }
 
-    // If order is already verified and marked paid in our DB
-    if (order.status === 'paid') {
-      return sendSuccess(res, {
-        status: 'paid',
-        verified: true,
-        orderId: order._id,
-        merchantTransactionId: order.merchantTransactionId,
-        amount: order.amount,
-        planTitle: order.pricingId?.title,
-      });
-    }
-
-    // Verify payment status with PhonePe
-    const phonepeStatus = await phonepeService.checkPaymentStatus(merchantTransactionId);
-
-    if (phonepeStatus.status === 'paid') {
-      await finalizeVerifiedPayment(order, phonepeStatus.transactionId, phonepeStatus.rawResponse);
-
-      return sendSuccess(res, {
-        status: 'paid',
-        verified: true,
-        orderId: order._id,
-        merchantTransactionId: order.merchantTransactionId,
-        amount: order.amount,
-        planTitle: order.pricingId?.title,
-      });
-    } else if (phonepeStatus.status === 'failed') {
-      order.status = 'failed';
-      await order.save();
-
-      return sendSuccess(res, {
-        status: 'failed',
-        verified: false,
-        orderId: order._id,
-        merchantTransactionId: order.merchantTransactionId,
-        message: 'Payment was declined or failed by gateway',
-      });
-    }
-
-    // Otherwise still pending
     return sendSuccess(res, {
-      status: 'pending',
-      verified: false,
+      status: order.status,
+      verified: order.status === 'paid',
       orderId: order._id,
       merchantTransactionId: order.merchantTransactionId,
-      message: 'Payment verification is currently pending',
+      amount: order.amount,
+      planTitle: order.pricingId?.title,
     });
   } catch (error) {
     next(error);
@@ -152,53 +195,44 @@ const getPaymentStatus = async (req, res, next) => {
 };
 
 /**
- * Handle PhonePe server-to-server webhook
+ * Handle Razorpay server-to-server webhook
  */
 const handleWebhook = async (req, res, next) => {
   try {
-    const signatureHeader = req.headers['x-phonepe-checksum-signature'] || req.headers['x-verify'];
-    const base64Response = req.body?.response;
+    const signatureHeader = req.headers['x-razorpay-signature'];
+    const rawBody = req.body;
 
-    logger.info('PhonePe Webhook Received', { hasSignature: !!signatureHeader });
+    logger.info('Razorpay Webhook Received', { hasSignature: !!signatureHeader });
 
-    if (!base64Response || !signatureHeader) {
-      return sendError(res, 'INVALID_WEBHOOK', 'Missing response payload or signature header', 400);
+    if (!signatureHeader) {
+      return sendError(res, 'INVALID_WEBHOOK', 'Missing signature header', 400);
     }
 
-    // Strict Webhook Signature Verification (V2 HMAC or V1 Checksum)
-    const isValidSignature = phonepeService.verifyWebhookSignature(base64Response, signatureHeader);
-    if (!isValidSignature) {
-      logger.warn('PhonePe Webhook Signature Verification Failed', { signatureHeader });
+    const isValid = razorpayService.verifyWebhookSignature(rawBody, signatureHeader);
+    if (!isValid) {
+      logger.warn('Razorpay Webhook Signature Verification Failed');
       return sendError(res, 'INVALID_SIGNATURE', 'Signature mismatch', 403);
     }
 
-    // Decode payload
-    const decodedPayloadStr = Buffer.from(base64Response, 'base64').toString('utf8');
-    const webhookData = JSON.parse(decodedPayloadStr);
+    const event = req.body;
+    const eventType = event.event;
 
-    const merchantTransactionId = webhookData.data?.merchantTransactionId;
-    const providerTxnId = webhookData.data?.transactionId;
-    const isSuccess = webhookData.code === 'PAYMENT_SUCCESS';
+    if (eventType === 'order.paid' || eventType === 'payment.captured') {
+      const paymentEntity = event.payload?.payment?.entity;
+      const razorpayOrderId = paymentEntity?.order_id || event.payload?.order?.entity?.id;
+      const razorpayPaymentId = paymentEntity?.id;
 
-    if (!merchantTransactionId) {
-      return sendError(res, 'INVALID_DATA', 'Missing merchantTransactionId in webhook', 400);
+      if (razorpayOrderId) {
+        const order = await Order.findOne({ razorpayOrderId });
+        if (order && order.status !== 'paid') {
+          await finalizeVerifiedPayment(order, razorpayPaymentId, event, {
+            razorpay_order_id: razorpayOrderId,
+            razorpay_payment_id: razorpayPaymentId,
+          });
+        }
+      }
     }
 
-    const order = await Order.findOne({ merchantTransactionId });
-    if (!order) {
-      logger.warn('Webhook received for non-existent order', { merchantTransactionId });
-      return sendError(res, 'ORDER_NOT_FOUND', 'Order not found', 404);
-    }
-
-    if (isSuccess) {
-      await finalizeVerifiedPayment(order, providerTxnId, webhookData);
-    } else {
-      order.status = 'failed';
-      await order.save();
-      logger.info('Order marked as failed via webhook', { merchantTransactionId });
-    }
-
-    // PhonePe expects 200 OK
     return sendSuccess(res, { received: true }, 'Webhook processed successfully');
   } catch (error) {
     next(error);
@@ -206,6 +240,7 @@ const handleWebhook = async (req, res, next) => {
 };
 
 module.exports = {
+  verifyPayment,
   getPaymentStatus,
   handleWebhook,
 };

@@ -11,7 +11,7 @@ This guide describes deploying CoachKush to an Ubuntu LTS server (AWS EC2, Digit
    - Root or Web: `@` -> `YOUR_SERVER_IP`
    - API: `api` -> `YOUR_SERVER_IP` (or single domain via reverse proxy `/api`)
 3. **MongoDB Atlas Cluster** (M0 Free or Production Dedicated)
-4. **PhonePe Production Credentials** (Merchant ID, Salt Key, Salt Index, Client ID)
+4. **Razorpay Production Credentials** (Key ID, Key Secret, optional Webhook Secret)
 5. **SMTP Mail Credentials** (Host, Port, User, Password)
 
 ---
@@ -90,11 +90,9 @@ SMTP_PASSWORD=<YOUR_SENDGRID_KEY>
 SMTP_FROM_EMAIL=coach@yourdomain.com
 SMTP_FROM_NAME=CoachKush
 
-PHONEPE_ENVIRONMENT=PRODUCTION
-PHONEPE_MERCHANT_ID=<YOUR_PRODUCTION_MERCHANT_ID>
-PHONEPE_SALT_KEY=<YOUR_PRODUCTION_SALT_KEY>
-PHONEPE_SALT_INDEX=1
-PHONEPE_CALLBACK_URL=https://yourdomain.com/api/payments/webhook
+RAZORPAY_KEY_ID=<YOUR_PRODUCTION_RAZORPAY_KEY_ID>
+RAZORPAY_KEY_SECRET=<YOUR_PRODUCTION_RAZORPAY_KEY_SECRET>
+RAZORPAY_WEBHOOK_SECRET=<YOUR_PRODUCTION_RAZORPAY_WEBHOOK_SECRET>
 ```
 
 ### 4. Build and Start Docker Containers

@@ -31,7 +31,7 @@ export const AdminOrders = () => {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Orders & Invoices</h1>
           <p className="text-xs text-brand-muted mt-0.5">
-            Audit PhonePe payment references, order statuses, and access official PDF tax invoices.
+            Audit Razorpay payment references, order statuses, and access official PDF tax invoices.
           </p>
         </div>
 

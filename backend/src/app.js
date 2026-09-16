@@ -17,6 +17,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const couponRoutes = require('./routes/couponRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 
 const app = express();
@@ -58,6 +59,7 @@ app.use(
       'Authorization',
       'X-Requested-With',
       'X-Request-ID',
+      'X-Razorpay-Signature',
       'X-VERIFY',
       'X-Client-Timestamp',
     ],
@@ -84,6 +86,7 @@ app.use('/api/pages', pagesRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/coupons', couponRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/admin', adminRoutes);
 

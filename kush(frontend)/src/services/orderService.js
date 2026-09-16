@@ -1,9 +1,21 @@
 import api from './api';
 
 export const orderService = {
-  // Master Rule: Frontend sends ONLY pricingId. Amount is authoritative on backend.
-  async createOrder(pricingId) {
-    const res = await api.post('/orders', { pricingId });
+  // Master Rule: Frontend sends ONLY pricingId and optional couponCode. Amount is authoritative on backend.
+  async createOrder({ pricingId, couponCode }) {
+    const payload = { pricingId };
+    if (couponCode) payload.couponCode = couponCode;
+    const res = await api.post('/orders', payload);
+    return res.data.data;
+  },
+
+  async validateCoupon({ code, pricingId }) {
+    const res = await api.post('/coupons/validate', { code, pricingId });
+    return res.data.data;
+  },
+
+  async verifyPayment(verificationData) {
+    const res = await api.post('/payments/verify', verificationData);
     return res.data.data;
   },
 

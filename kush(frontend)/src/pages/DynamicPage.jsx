@@ -6,8 +6,9 @@ import { Button } from '../components/common/Button';
 import { formatDate } from '../utils/formatters';
 import { Loader2, ArrowLeft, FileText } from 'lucide-react';
 
-export const DynamicPage = () => {
-  const { slug } = useParams();
+export const DynamicPage = ({ defaultSlug }) => {
+  const params = useParams();
+  const slug = defaultSlug || params.slug;
 
   const { data: page, isLoading, isError } = useQuery({
     queryKey: ['page', slug],

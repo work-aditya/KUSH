@@ -3,7 +3,9 @@ process.env.JWT_SECRET = 'test_secret_key_at_least_32_characters_long_12345';
 process.env.MONGO_URI = 'mongodb://localhost:27017/coachkush_test';
 process.env.ADMIN_USERNAME = 'admin_test';
 process.env.ADMIN_PASSWORD = 'AdminTestPassword123!';
-process.env.PHONEPE_ENVIRONMENT = 'SANDBOX';
+process.env.RAZORPAY_KEY_ID = 'rzp_test_mock_1234567890';
+process.env.RAZORPAY_KEY_SECRET = 'mock_secret_key_1234567890';
+process.env.RAZORPAY_WEBHOOK_SECRET = 'mock_webhook_secret_12345';
 
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');

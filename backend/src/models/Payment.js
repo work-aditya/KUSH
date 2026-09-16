@@ -8,7 +8,25 @@ const paymentSchema = new mongoose.Schema(
       required: [true, 'Order ID is required'],
       index: true,
     },
+    provider: {
+      type: String,
+      default: 'Razorpay',
+    },
     providerTransactionId: {
+      type: String,
+      trim: true,
+    },
+    razorpayPaymentId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    razorpayOrderId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    razorpaySignature: {
       type: String,
       trim: true,
     },

@@ -4,7 +4,7 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A sharp, minimalistic, high-performance full-stack online coaching platform designed for Coach Kush. Supports real-time interactive 1-on-1 and couple coaching sessions via **Google Meet** and **Zoom**, featuring official **PhonePe** payment processing, cryptographic signature verification, automated **PDF tax invoice** generation, **SMTP email confirmation**, and a role-based administrative dashboard.
+A sharp, minimalistic, high-performance full-stack online coaching platform designed for Coach Kush. Supports real-time interactive 1-on-1 and couple coaching sessions via **Google Meet** and **Zoom**, featuring official **Razorpay** payment processing, cryptographic signature verification, dynamic coupon discount promotions, automated **PDF tax invoice** generation, **SMTP email confirmation**, editable CMS documents (Privacy Policy, Terms), and a role-based administrative dashboard.
 
 ---
 
@@ -23,9 +23,9 @@ Nginx Reverse Proxy (:80 / :443)
                        │
           ┌────────────┴────────────┐
           ▼                         ▼
-    MongoDB Atlas           PhonePe Gateway
+    MongoDB Atlas           Razorpay Gateway
           │                         │
-          │ (Authoritative)         ▼ (Callback / Webhook)
+          │ (Authoritative)         ▼ (Signature Verification)
           ▼                  Verified Result
       Database                      │
           │                         ▼
@@ -53,7 +53,7 @@ Nginx Reverse Proxy (:80 / :443)
 - **Database & ODM**: MongoDB with Mongoose
 - **Password Hashing**: Argon2id (`argon2`)
 - **Authentication**: JWT transported via Secure, SameSite, HTTP-only cookies (`coachkush_session`)
-- **Payments**: PhonePe PG Standard Integration (SHA256 checksums, webhook verification, server-side authoritative pricing)
+- **Payments**: Razorpay PG Standard Integration (HMAC-SHA256 signature verification, webhook verification, server-side authoritative pricing & coupons)
 - **PDF Generation**: PDFKit (branded tax invoices)
 - **Email Delivery**: Nodemailer (SMTP transport with PDF invoice attachment)
 - **Security Middleware**: Helmet, CORS, Express Rate Limit, Mongo Sanitize, Structured JSON Logging
@@ -69,11 +69,11 @@ Nginx Reverse Proxy (:80 / :443)
 ## 🔒 Security Principles
 
 1. **Zero Hard-Coded Credentials**: Every secret, domain, key, database URI, and password must be configured through environment variables or server secrets.
-2. **Authoritative Server-Side Pricing**: Trainees send only `pricingId`. The backend retrieves the authoritative price from MongoDB. Client-submitted prices are completely ignored.
-3. **Cryptographic Payment Verification**: Payment success is verified directly with PhonePe. Webhooks enforce SHA256 checksum validation before marking orders `paid`.
+2. **Authoritative Server-Side Pricing & Discounts**: Trainees send only `pricingId` and optional `couponCode`. The backend retrieves the authoritative price from MongoDB and computes discounts securely. Client-submitted prices are completely ignored.
+3. **Cryptographic Payment Verification**: Payment success is verified using Razorpay HMAC-SHA256 signatures before marking orders `paid`.
 4. **Idempotency & Duplicate Protection**: Webhooks and status verification handlers are idempotent to eliminate double-charging or duplicate invoice generation.
 5. **IDOR Prevention**: Trainees can only view or download invoices and orders matching their authenticated `userId`. Admin privileges are verified server-side via JWT identity (`role === 'admin'`).
-6. **Credential Redaction**: Passwords, hashes, tokens, cookies, and gateway salt keys are automatically redacted from structured logs.
+6. **Credential Redaction**: Passwords, hashes, tokens, cookies, and gateway secret keys are automatically redacted from structured logs.
 
 ---
 
@@ -88,11 +88,11 @@ Nginx Reverse Proxy (:80 / :443)
 │   ├── Dockerfile           # Multi-stage Node 22 Alpine backend container
 │   ├── src/
 │   │   ├── config/          # Environment validation, DB, logger
-│   │   ├── controllers/     # REST controllers (auth, pricing, orders, payments, admin)
+│   │   ├── controllers/     # REST controllers (auth, pricing, orders, payments, coupons, admin)
 │   │   ├── middleware/      # Auth, rateLimiter, errorHandler, validation
-│   │   ├── models/          # User, Pricing, Page, Order, Payment, Invoice, ContactMessage
+│   │   ├── models/          # User, Pricing, Page, Order, Payment, Invoice, Coupon, ContactMessage
 │   │   ├── routes/          # Express route declarations
-│   │   ├── services/        # PhonePe, PDFKit Invoice, Nodemailer, Admin Bootstrapper
+│   │   ├── services/        # Razorpay, PDFKit Invoice, Nodemailer, Admin Bootstrapper
 │   │   ├── templates/       # HTML email templates
 │   │   └── utils/           # Argon2id hash, JWT cookies, response formatter
 │   └── tests/               # Jest & Supertest integration tests
@@ -100,9 +100,9 @@ Nginx Reverse Proxy (:80 / :443)
     ├── Dockerfile           # Multi-stage Vite build + Nginx static server
     ├── nginx.conf           # SPA client routing fallback configuration
     └── src/
-        ├── components/      # Navbar, Footer, Buttons, Modals, WhatsApp CTA
+        ├── components/      # Navbar, Footer, Buttons, Modals, WhatsApp CTA, FAQSection, CheckoutModal
         ├── layouts/         # MainLayout, AdminLayout
-        ├── pages/           # Home, About, Pricing, Contact, Login, Register, Payment, Admin
+        ├── pages/           # Home, About, Pricing, FAQ, Contact, Login, Register, Payment, Admin
         ├── services/        # Axios API client modules
         └── store/           # Redux Toolkit auth and UI slices
 ```
@@ -125,10 +125,9 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_chars
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=YourSecureAdminPassword123!
 WHATSAPP_CONTACT_URL=https://wa.me/91XXXXXXXXXX
-PHONEPE_ENVIRONMENT=SANDBOX
-PHONEPE_MERCHANT_ID=PGTESTPAYUAT
-PHONEPE_SALT_KEY=099eb0cd-02cf-4e2a-8aca-3e6c6aff0399
-PHONEPE_SALT_INDEX=1
+RAZORPAY_KEY_ID=YOUR_RAZORPAY_KEY_ID
+RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
+RAZORPAY_WEBHOOK_SECRET=YOUR_RAZORPAY_WEBHOOK_SECRET
 ```
 
 ### 2. Install Dependencies

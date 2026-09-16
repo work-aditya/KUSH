@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Shield,
+  Ticket,
 } from 'lucide-react';
 
 export const AdminLayout = () => {
@@ -30,6 +31,7 @@ export const AdminLayout = () => {
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
     { name: 'Pricing Plans', path: '/admin/pricing', icon: CreditCard },
+    { name: 'Coupons & Discounts', path: '/admin/coupons', icon: Ticket },
     { name: 'CMS Pages', path: '/admin/pages', icon: FileText },
     { name: 'Orders & Payments', path: '/admin/orders', icon: ShoppingBag },
     { name: 'Users Directory', path: '/admin/users', icon: Users },

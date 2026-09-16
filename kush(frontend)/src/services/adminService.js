@@ -43,6 +43,24 @@ export const adminService = {
     return res.data;
   },
 
+  // Coupons Management
+  async getCoupons() {
+    const res = await api.get('/admin/coupons');
+    return res.data.data;
+  },
+  async createCoupon(coupon) {
+    const res = await api.post('/admin/coupons', coupon);
+    return res.data.data;
+  },
+  async deleteCoupon(id) {
+    const res = await api.delete(`/admin/coupons/${id}`);
+    return res.data;
+  },
+  async toggleCouponStatus(id) {
+    const res = await api.patch(`/admin/coupons/${id}/toggle`);
+    return res.data.data;
+  },
+
   // Orders
   async getOrders() {
     const res = await api.get('/admin/orders');

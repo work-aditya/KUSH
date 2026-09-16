@@ -51,7 +51,7 @@ export const PaymentSuccessPage = () => {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
         <Loader2 className="w-10 h-10 text-brand-accent animate-spin" />
-        <h2 className="text-xl font-bold text-white">Verifying Payment With PhonePe...</h2>
+        <h2 className="text-xl font-bold text-white">Verifying Payment With Razorpay...</h2>
         <p className="text-xs text-brand-muted max-w-sm">
           Securing cryptographic verification from the payment provider. Please do not refresh.
         </p>
@@ -98,7 +98,7 @@ export const PaymentSuccessPage = () => {
             Welcome to CoachKush!
           </h1>
           <p className="text-sm sm:text-base text-brand-muted max-w-lg mx-auto leading-relaxed">
-            Your transaction has been securely confirmed by PhonePe and your training enrollment is officially active.
+            Your transaction has been securely confirmed by Razorpay and your training enrollment is officially active.
           </p>
         </div>
 

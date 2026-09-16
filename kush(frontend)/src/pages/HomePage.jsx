@@ -25,6 +25,7 @@ import {
   Radio,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { FAQSection } from '../components/common/FAQSection';
 
 const DEFAULT_PLANS = [
   {
@@ -176,7 +177,7 @@ export const HomePage = () => {
                   <p className="text-[11px] text-brand-muted uppercase font-bold tracking-wider">& Couple Options</p>
                 </div>
                 <div>
-                  <p className="text-2xl sm:text-3xl font-black text-brand-emerald">PhonePe</p>
+                  <p className="text-2xl sm:text-3xl font-black text-brand-emerald">Razorpay</p>
                   <p className="text-[11px] text-brand-muted uppercase font-bold tracking-wider">Secure Checkouts</p>
                 </div>
               </div>
@@ -415,7 +416,7 @@ export const HomePage = () => {
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2.5 flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
-                    PhonePe Verified • Instant Tax Invoice
+                    Razorpay Verified • Instant Tax Invoice
                   </p>
                 </div>
               </div>
@@ -483,7 +484,10 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. CALL TO ACTION SECTION */}
+      {/* 5. INTERACTIVE FAQ SECTION */}
+      <FAQSection className="my-16 border-t border-brand-border/60 pt-16" />
+
+      {/* 6. CALL TO ACTION SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-brand-card via-brand-surface to-[#0D1524] border border-brand-border p-8 sm:p-16 text-center shadow-2xl">
           <div className="relative z-10 max-w-3xl mx-auto space-y-6">
@@ -492,7 +496,7 @@ export const HomePage = () => {
               Ready for Unmatched Accountability & Results?
             </h2>
             <p className="text-base text-brand-muted leading-relaxed">
-              Experience the power of live 1-on-1 and couple coaching with Coach Kush. Secure your membership today with PhonePe or reach out directly on WhatsApp.
+              Experience the power of live 1-on-1 and couple coaching with Coach Kush. Secure your membership today with Razorpay or reach out directly on WhatsApp.
             </p>
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/pricing">

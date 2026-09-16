@@ -1,25 +1,34 @@
 const request = require('supertest');
 const app = require('../src/app');
 const { setupTestDB } = require('./setup');
-const phonepeService = require('../src/services/phonepeService');
+const razorpayService = require('../src/services/razorpayService');
 
 setupTestDB();
 
-describe('Security & Payment Checksum Verification', () => {
+describe('Security & Payment Signature Verification', () => {
   it('should return health check ok', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
     expect(res.body.checks.api).toBe('ok');
   });
 
-  it('should accurately compute and verify PhonePe webhook signatures', () => {
-    const mockPayload = Buffer.from(JSON.stringify({ code: 'PAYMENT_SUCCESS', data: { amount: 899900 } })).toString('base64');
-    const validSignature = phonepeService.generateChecksum(mockPayload);
+  it('should accurately compute and verify Razorpay payment HMAC-SHA256 signatures', () => {
+    const orderId = 'order_test_987654321';
+    const paymentId = 'pay_test_123456789';
+    const validSignature = razorpayService.generateTestSignature(orderId, paymentId);
 
-    const isVerified = phonepeService.verifyWebhookSignature(mockPayload, validSignature);
+    const isVerified = razorpayService.verifyPaymentSignature({
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: validSignature,
+    });
     expect(isVerified).toBe(true);
 
-    const isFakeVerified = phonepeService.verifyWebhookSignature(mockPayload, 'invalid_signature_12345###1');
+    const isFakeVerified = razorpayService.verifyPaymentSignature({
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: 'tampered_signature_hex_value_1234567890abcdef',
+    });
     expect(isFakeVerified).toBe(false);
   });
 

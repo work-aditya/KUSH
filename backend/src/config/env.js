@@ -33,15 +33,10 @@ const envSchema = z.object({
   SMTP_FROM_EMAIL: z.string().default('noreply@coachkush.com'),
   SMTP_FROM_NAME: z.string().default('CoachKush'),
 
-  // PhonePe Gateway (Standard Checkout V2 & Legacy)
-  PHONEPE_ENVIRONMENT: z.enum(['SANDBOX', 'PRODUCTION']).default('SANDBOX'),
-  PHONEPE_CLIENT_ID: z.string().optional(),
-  PHONEPE_CLIENT_SECRET: z.string().optional(),
-  PHONEPE_CLIENT_VERSION: z.string().default('1'),
-  PHONEPE_MERCHANT_ID: z.string().default('PGTESTPAYUAT'),
-  PHONEPE_SALT_KEY: z.string().default('099eb0cd-02cf-4e2a-8aca-3e6c6aff0399'),
-  PHONEPE_SALT_INDEX: z.string().default('1'),
-  PHONEPE_CALLBACK_URL: z.string().optional(),
+  // Razorpay Gateway
+  RAZORPAY_KEY_ID: z.string().default('rzp_test_placeholder'),
+  RAZORPAY_KEY_SECRET: z.string().default('secret_placeholder'),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -69,14 +64,9 @@ const env = parsed.success ? parsed.data : {
   SMTP_PASSWORD: process.env.SMTP_PASSWORD,
   SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL || 'noreply@coachkush.com',
   SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || 'CoachKush',
-  PHONEPE_ENVIRONMENT: process.env.PHONEPE_ENVIRONMENT || 'SANDBOX',
-  PHONEPE_CLIENT_ID: process.env.PHONEPE_CLIENT_ID,
-  PHONEPE_CLIENT_SECRET: process.env.PHONEPE_CLIENT_SECRET,
-  PHONEPE_CLIENT_VERSION: process.env.PHONEPE_CLIENT_VERSION || '1',
-  PHONEPE_MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID || 'PGTESTPAYUAT',
-  PHONEPE_SALT_KEY: process.env.PHONEPE_SALT_KEY || '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399',
-  PHONEPE_SALT_INDEX: process.env.PHONEPE_SALT_INDEX || '1',
-  PHONEPE_CALLBACK_URL: process.env.PHONEPE_CALLBACK_URL || 'http://localhost:5000/api/payments/webhook',
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+  RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || 'secret_placeholder',
+  RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET,
 };
 
 module.exports = env;

@@ -12,6 +12,7 @@ import { PricingPage } from './pages/PricingPage';
 import { ContactPage } from './pages/ContactPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { FAQPage } from './pages/FAQPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentFailedPage } from './pages/PaymentFailedPage';
 import { DynamicPage } from './pages/DynamicPage';
@@ -20,6 +21,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminPricing } from './pages/admin/AdminPricing';
+import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminPages } from './pages/admin/AdminPages';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminUsers } from './pages/admin/AdminUsers';
@@ -36,9 +38,12 @@ export function App() {
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="pricing" element={<PricingPage />} />
+          <Route path="faq" element={<FAQPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="privacy" element={<DynamicPage defaultSlug="privacy" />} />
+          <Route path="terms" element={<DynamicPage defaultSlug="terms" />} />
           <Route
             path="payment/success"
             element={
@@ -67,6 +72,7 @@ export function App() {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="pricing" element={<AdminPricing />} />
+          <Route path="coupons" element={<AdminCoupons />} />
           <Route path="pages" element={<AdminPages />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />

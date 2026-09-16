@@ -6,6 +6,8 @@ const validate = require('../middleware/validate');
 const { createPricingSchema, updatePricingSchema } = require('../validators/pricingValidator');
 const { createPageSchema, updatePageSchema } = require('../validators/pageValidator');
 
+const couponController = require('../controllers/couponController');
+
 // Strict server-side authorization: all routes require authenticated admin
 router.use(authenticateUser);
 router.use(requireAdmin);
@@ -18,6 +20,12 @@ router.get('/pricing', adminController.getAllPricingPlansAdmin);
 router.post('/pricing', validate(createPricingSchema), adminController.createPricingPlan);
 router.put('/pricing/:id', validate(updatePricingSchema), adminController.updatePricingPlan);
 router.delete('/pricing/:id', adminController.deletePricingPlan);
+
+// Coupons Management (Admin addition & deletion)
+router.get('/coupons', couponController.getAllCouponsAdmin);
+router.post('/coupons', couponController.createCouponAdmin);
+router.delete('/coupons/:id', couponController.deleteCouponAdmin);
+router.patch('/coupons/:id/toggle', couponController.toggleCouponStatusAdmin);
 
 // Pages CMS Management
 router.get('/pages', adminController.getAllPagesAdmin);

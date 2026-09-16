@@ -37,7 +37,27 @@ const orderSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      default: 'PhonePe',
+      default: 'Razorpay',
+    },
+    razorpayOrderId: {
+      type: String,
+      index: true,
+    },
+    originalAmount: {
+      type: Number,
+    },
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+    couponCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
+    couponId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Coupon',
     },
   },
   {

@@ -1,17 +1,19 @@
 const crypto = require('crypto');
 const Order = require('../models/Order');
 const Pricing = require('../models/Pricing');
-const phonepeService = require('../services/phonepeService');
+const Coupon = require('../models/Coupon');
+const razorpayService = require('../services/razorpayService');
+const env = require('../config/env');
 const { sendSuccess, sendError } = require('../utils/response');
 const logger = require('../config/logger');
 
 /**
- * Create a new coaching order and initiate PhonePe transaction
- * Master Security Principle: Frontend sends ONLY pricingId. Backend resolves authoritative price.
+ * Create a new coaching order and initiate Razorpay transaction with optional coupon
+ * Master Security Principle: Frontend sends ONLY pricingId and optional couponCode. Backend resolves authoritative prices.
  */
 const createOrder = async (req, res, next) => {
   try {
-    const { pricingId } = req.body;
+    const { pricingId, couponCode } = req.body;
     const userId = req.user._id;
 
     const pricing = await Pricing.findOne({ _id: pricingId, active: true });
@@ -19,56 +21,92 @@ const createOrder = async (req, res, next) => {
       return sendError(res, 'PRICING_NOT_FOUND', 'Selected pricing plan is no longer active or available', 404);
     }
 
+    let discountAmount = 0;
+    let appliedCoupon = null;
+
+    if (couponCode && typeof couponCode === 'string' && couponCode.trim()) {
+      const normalizedCode = couponCode.trim().toUpperCase();
+      appliedCoupon = await Coupon.findOne({ code: normalizedCode });
+
+      if (!appliedCoupon) {
+        return sendError(res, 'INVALID_COUPON', `Coupon "${normalizedCode}" was not found`, 404);
+      }
+
+      const validity = appliedCoupon.isValidForAmount(pricing.price);
+      if (!validity.valid) {
+        return sendError(res, 'COUPON_INVALID', validity.reason, 400);
+      }
+
+      discountAmount = appliedCoupon.calculateDiscount(pricing.price);
+    }
+
+    const finalAmount = Math.max(0, pricing.price - discountAmount);
+
     // Generate unique merchantTransactionId: CK_<timestamp>_<hex>
     const uniqueSuffix = crypto.randomBytes(4).toString('hex').toUpperCase();
     const merchantTransactionId = `CK_${Date.now()}_${uniqueSuffix}`;
 
-    // Create Order in MongoDB with authoritative price
+    // Create Razorpay Order
+    let razorpayOrder;
+    try {
+      razorpayOrder = await razorpayService.createOrder({
+        amountInRupees: finalAmount,
+        receipt: merchantTransactionId,
+        notes: {
+          merchantTransactionId,
+          pricingId: pricing._id.toString(),
+          userId: userId.toString(),
+          couponCode: appliedCoupon ? appliedCoupon.code : '',
+        },
+      });
+    } catch (rzpErr) {
+      logger.error('Failed to create Razorpay order', { error: rzpErr.message });
+      return sendError(res, 'PAYMENT_GATEWAY_ERROR', 'Failed to initialize payment gateway order session', 502);
+    }
+
+    // Save Order in MongoDB with authoritative pricing & coupon metadata
     const order = await Order.create({
       userId,
       pricingId: pricing._id,
-      amount: pricing.price,
+      amount: finalAmount,
+      originalAmount: pricing.price,
+      discountAmount,
+      couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+      couponId: appliedCoupon ? appliedCoupon._id : undefined,
       currency: pricing.currency || 'INR',
-      status: 'created',
+      status: 'pending',
       merchantTransactionId,
-      provider: 'PhonePe',
+      razorpayOrderId: razorpayOrder.id,
+      provider: 'Razorpay',
     });
 
-    logger.info('Order created in database', {
+    logger.info('Order created in database with Razorpay order', {
       orderId: order._id,
       merchantTransactionId,
       amount: order.amount,
+      razorpayOrderId: razorpayOrder.id,
       userId,
     });
 
-    // Initiate transaction with PhonePe
-    const phonePeResult = await phonepeService.initiatePayment({
-      merchantTransactionId,
-      merchantUserId: userId,
-      amountInRupees: order.amount,
-      userPhone: req.user.phone,
-    });
-
-    if (!phonePeResult.success && !phonePeResult.isSimulated) {
-      order.status = 'failed';
-      await order.save();
-      return sendError(res, 'PAYMENT_INIT_FAILED', phonePeResult.message || 'Failed to initiate payment gateway session', 502);
-    }
-
-    // Update order status to pending
-    order.status = 'pending';
-    await order.save();
-
-    // Return only safe checkout details to frontend (never secrets or raw keys)
+    // Return safe checkout details for Razorpay modal
     return sendSuccess(
       res,
       {
         orderId: order._id,
         merchantTransactionId: order.merchantTransactionId,
+        razorpayOrderId: razorpayOrder.id,
         amount: order.amount,
+        originalAmount: order.originalAmount,
+        discountAmount: order.discountAmount,
+        couponCode: order.couponCode,
         currency: order.currency,
         planTitle: pricing.title,
-        redirectUrl: phonePeResult.redirectUrl,
+        keyId: env.RAZORPAY_KEY_ID,
+        user: {
+          name: req.user.name,
+          email: req.user.email,
+          phone: req.user.phone,
+        },
       },
       'Order created successfully',
       201

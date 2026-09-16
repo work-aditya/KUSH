@@ -18,7 +18,7 @@ export const PaymentFailedPage = () => {
         <div className="space-y-2">
           <h1 className="text-2xl sm:text-3xl font-black text-white">Payment Unsuccessful</h1>
           <p className="text-sm text-brand-muted leading-relaxed">
-            The transaction could not be completed by PhonePe or was canceled by the bank. No charges were made to your account.
+            The transaction could not be completed by Razorpay or was canceled by the bank. No charges were made to your account.
           </p>
           {orderRef && (
             <p className="text-xs text-brand-darkMuted font-mono">

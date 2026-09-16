@@ -8,6 +8,8 @@ import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { formatINR } from '../utils/formatters';
+import { CheckoutModal } from '../components/checkout/CheckoutModal';
+import { FAQSection } from '../components/common/FAQSection';
 import {
   CheckCircle,
   Video,
@@ -23,11 +25,11 @@ import { useDispatch } from 'react-redux';
 import { addToast } from '../store/slices/uiSlice';
 
 export const PricingPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [filter, setFilter] = useState('all'); // 'all', 'single', 'couple'
-  const [activeProcessingId, setActiveProcessingId] = useState(null);
+  const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState(null);
 
   // Fetch active plans from MongoDB via backend REST API
   const { data: plans = [], isLoading, isError, refetch } = useQuery({
@@ -35,31 +37,12 @@ export const PricingPage = () => {
     queryFn: pricingService.getActivePlans,
   });
 
-  // Order creation & PhonePe payment initiation mutation
-  const checkoutMutation = useMutation({
-    mutationFn: (pricingId) => orderService.createOrder(pricingId),
-    onSuccess: (data) => {
-      // Backend returns safe checkout details with PhonePe redirect URL
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
-      } else {
-        navigate(`/payment/success?orderRef=${data.merchantTransactionId}`);
-      }
-    },
-    onError: (err) => {
-      dispatch(addToast({ type: 'error', message: err.message || 'Unable to initiate payment session' }));
-      setActiveProcessingId(null);
-    },
-  });
-
-  const handleCheckout = async (planId) => {
+  const handleCheckout = (plan) => {
     if (!isAuthenticated) {
       navigate('/login', { state: { returnTo: '/pricing' } });
       return;
     }
-
-    setActiveProcessingId(planId);
-    checkoutMutation.mutate(planId);
+    setSelectedPlanForCheckout(plan);
   };
 
   const filteredPlans = plans.filter((p) => {
@@ -204,15 +187,14 @@ export const PricingPage = () => {
                     variant={isCouple ? 'emerald' : 'primary'}
                     size="lg"
                     className="w-full text-sm font-bold uppercase tracking-wider gap-2 shadow-xl"
-                    isLoading={isProcessing}
-                    onClick={() => handleCheckout(plan._id)}
+                    onClick={() => handleCheckout(plan)}
                   >
-                    {isAuthenticated ? 'Buy Now' : 'Login / Buy'}
-                    {!isProcessing && <ArrowRight className="w-4 h-4" />}
+                    {isAuthenticated ? 'Enroll / Buy Now' : 'Login to Enroll'}
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3 h-3 text-brand-emerald" />
-                    Secured by PhonePe • Instant Tax Invoice
+                    Secured by Razorpay • Instant Tax Invoice
                   </p>
                 </div>
               </div>
@@ -221,7 +203,7 @@ export const PricingPage = () => {
         </div>
       )}
 
-      {/* Guarantee & FAQ note */}
+      {/* Guarantee & Contact note */}
       <div className="glass-card rounded-2xl p-8 border border-brand-border flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-1 text-center md:text-left">
           <h3 className="text-lg font-bold text-white flex items-center justify-center md:justify-start gap-2">
@@ -234,6 +216,17 @@ export const PricingPage = () => {
         </div>
         <WhatsAppButton text="Chat with Kush on WhatsApp" />
       </div>
+
+      {/* Interactive FAQ Section */}
+      <FAQSection className="pt-8 border-t border-brand-border/60" />
+
+      {/* Checkout Modal with Coupon Support and Razorpay */}
+      <CheckoutModal
+        isOpen={Boolean(selectedPlanForCheckout)}
+        onClose={() => setSelectedPlanForCheckout(null)}
+        plan={selectedPlanForCheckout}
+        user={user}
+      />
     </div>
   );
 };

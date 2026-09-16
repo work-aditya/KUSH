@@ -7,11 +7,12 @@ const validate = require('../middleware/validate');
 const { createOrderSchema } = require('../validators/orderValidator');
 const { paymentLimiter } = require('../middleware/rateLimiter');
 
-// Public webhook endpoint for PhonePe callbacks with signature verification
+// Public webhook endpoint for Razorpay callbacks with signature verification
 router.post('/webhook', paymentController.handleWebhook);
 
 // Protected routes
 router.post('/create', authenticateUser, paymentLimiter, validate(createOrderSchema), orderController.createOrder);
+router.post('/verify', authenticateUser, paymentController.verifyPayment);
 router.get('/status/:merchantTransactionId', authenticateUser, paymentController.getPaymentStatus);
 
 module.exports = router;

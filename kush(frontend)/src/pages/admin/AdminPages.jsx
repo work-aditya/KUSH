@@ -6,7 +6,7 @@ import { Badge } from '../../components/common/Badge';
 import { formatDate } from '../../utils/formatters';
 import { useDispatch } from 'react-redux';
 import { addToast } from '../../store/slices/uiSlice';
-import { Plus, Edit2, Trash2, CheckCircle, XCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, XCircle, ExternalLink, Loader2, ShieldCheck, FileText } from 'lucide-react';
 
 export const AdminPages = () => {
   const queryClient = useQueryClient();
@@ -113,6 +113,69 @@ export const AdminPages = () => {
           Create New Page
         </Button>
       </div>
+
+      {/* Quick Edit Privacy Policy Banner */}
+      {(() => {
+        const privacyPage = pages.find((p) => p.slug === 'privacy');
+        return (
+          <div className="glass-card rounded-2xl p-5 border border-brand-accent/30 bg-gradient-to-r from-brand-card via-brand-surface to-brand-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center text-brand-accent shrink-0 mt-0.5">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-white">Privacy Policy Page</h3>
+                  <Badge variant={privacyPage?.published ? 'emerald' : 'accent'}>
+                    {privacyPage ? (privacyPage.published ? 'Published' : 'Draft') : 'Ready to Create'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-brand-muted mt-0.5">
+                  {privacyPage
+                    ? `Public URL: /pages/privacy or /privacy • Last updated: ${formatDate(privacyPage.updatedAt)}`
+                    : 'The Privacy Policy page has not been customized yet. Click below to initialize and edit.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {privacyPage && (
+                <a
+                  href="/pages/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 rounded-xl bg-brand-card border border-brand-border text-xs font-semibold text-brand-muted hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  View Live
+                </a>
+              )}
+              <Button
+                variant="primary"
+                size="sm"
+                className="gap-2"
+                onClick={() => {
+                  if (privacyPage) {
+                    openEditModal(privacyPage);
+                  } else {
+                    setEditingPage(null);
+                    setFormData({
+                      title: 'Privacy Policy',
+                      slug: 'privacy',
+                      content: `Coach Kush Fitness Privacy Policy...`,
+                      published: true,
+                    });
+                    setModalOpen(true);
+                  }
+                }}
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                {privacyPage ? 'Edit Privacy Policy' : 'Create Privacy Policy'}
+              </Button>
+            </div>
+          </div>
+        );
+      })()}
 
       {isLoading ? (
         <div className="min-h-[40vh] flex flex-col items-center justify-center gap-3">
