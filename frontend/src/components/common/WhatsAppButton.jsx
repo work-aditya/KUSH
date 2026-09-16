@@ -11,7 +11,7 @@ export const WhatsAppButton = ({
   const whatsappUrl =
     url ||
     import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
-    'https://wa.me/919999999999';
+    'https://wa.me/917042858524';
 
   if (variant === 'floating') {
     return (
