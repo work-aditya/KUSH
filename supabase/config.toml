@@ -20,7 +20,7 @@ api_role = "anon"
 
 [auth]
 enabled = true
-site_url = "Site URL: "https://kush-frontend.vercel.app"
+site_url = "https://kush-frontend.vercel.app"
 additional_redirect_urls = ["https://localhost:5173", "http://localhost:3000"]
 jwt_expiry = 3600
 enable_signup = true
