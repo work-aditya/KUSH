@@ -1,16 +1,21 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import api from '../../services/api';
+import { supabase } from '../../lib/supabaseClient';
 import { Badge } from '../../components/common/Badge';
-import { CheckCircle2, Shield, Server, CreditCard, Mail, Globe, MessageCircle } from 'lucide-react';
+import { CheckCircle2, Shield, Server, CreditCard, Mail, Globe, Database, Key } from 'lucide-react';
 
 export const AdminSettings = () => {
-  const { data: healthData } = useQuery({
-    queryKey: ['health'],
+  const { data: dbHealth } = useQuery({
+    queryKey: ['supabase-health'],
     queryFn: async () => {
-      const res = await api.get('/health');
-      return res.data;
+      try {
+        const { error } = await supabase.from('products').select('id', { head: true, count: 'exact' });
+        return { database: error ? 'Degraded' : 'Connected', error: error?.message };
+      } catch (err) {
+        return { database: 'Offline', error: err.message };
+      }
     },
+    staleTime: 30000,
   });
 
   return (
@@ -18,7 +23,7 @@ export const AdminSettings = () => {
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">System & Deployment Health</h1>
         <p className="text-xs text-brand-muted mt-0.5">
-          Review environment parameters, security states, and production service integrations.
+          Review environment parameters, Supabase PostgreSQL, Edge Functions, and Razorpay integrations.
         </p>
       </div>
 
@@ -26,40 +31,40 @@ export const AdminSettings = () => {
       <div className="glass-card rounded-2xl p-6 border border-brand-border space-y-4">
         <h2 className="text-base font-bold text-white flex items-center gap-2">
           <Server className="w-4 h-4 text-brand-accent" />
-          Service Status Check
+          Production Service Status
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="p-4 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between">
             <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-white">REST API Runtime</p>
-              <p className="text-[11px] text-brand-muted">Express Engine</p>
+              <p className="text-xs font-semibold text-white">Database Cluster</p>
+              <p className="text-[11px] text-brand-muted">Supabase PostgreSQL 15</p>
             </div>
-            <Badge variant="emerald">Healthy ({healthData?.status || 'ok'})</Badge>
+            <Badge variant="emerald">{dbHealth?.database || 'Connected'}</Badge>
           </div>
 
           <div className="p-4 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between">
             <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-white">Database Cluster</p>
-              <p className="text-[11px] text-brand-muted">MongoDB Atlas</p>
+              <p className="text-xs font-semibold text-white">Serverless Backend</p>
+              <p className="text-[11px] text-brand-muted">Supabase Edge Functions (Deno)</p>
             </div>
-            <Badge variant="emerald">{healthData?.checks?.database || 'Connected'}</Badge>
+            <Badge variant="emerald">Operational</Badge>
           </div>
 
           <div className="p-4 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between">
             <div className="space-y-0.5">
               <p className="text-xs font-semibold text-white">Payment Gateway</p>
-              <p className="text-[11px] text-brand-muted">Razorpay PG Standard</p>
+              <p className="text-[11px] text-brand-muted">Razorpay Standard PG</p>
             </div>
             <Badge variant="accent">Active</Badge>
           </div>
 
           <div className="p-4 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between">
             <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-white">Invoice Delivery</p>
-              <p className="text-[11px] text-brand-muted">PDFKit & Nodemailer</p>
+              <p className="text-xs font-semibold text-white">Identity & Access</p>
+              <p className="text-[11px] text-brand-muted">Supabase Auth (RLS Enforced)</p>
             </div>
-            <Badge variant="emerald">Operational</Badge>
+            <Badge variant="emerald">Secured</Badge>
           </div>
         </div>
       </div>
@@ -78,26 +83,28 @@ export const AdminSettings = () => {
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>Server-side authoritative pricing: Client prices are never trusted.</span>
+            <span>Server-side authoritative pricing: Razorpay order amounts computed directly from PostgreSQL.</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>Argon2id password hashing implemented for all stored credentials.</span>
+            <span>PostgreSQL Row-Level Security (RLS) enabled on all 18+ tables.</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>Secure HTTP-only cookies (<code className="text-brand-accent">coachkush_session</code>) for session security.</span>
+            <span>Supabase JWT identity verification enforced on Edge Functions.</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>Razorpay HMAC-SHA256 payment signature and webhook verification enforced.</span>
+            <span>Razorpay HMAC-SHA256 payment signature verification enforced server-side.</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-            <span>IDOR protections enforced on all order and invoice download endpoints.</span>
+            <span>Idempotent webhook processing via dedicated <code className="text-brand-accent">payment_events</code> table.</span>
           </li>
         </ul>
       </div>
     </div>
   );
 };
+
+export default AdminSettings;

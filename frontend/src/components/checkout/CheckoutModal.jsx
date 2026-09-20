@@ -45,7 +45,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
     try {
       const data = await orderService.validateCoupon({
         code: couponInput.trim().toUpperCase(),
-        pricingId: plan._id,
+        pricingId: plan.id || plan._id,
       });
 
       setAppliedCoupon(data);
@@ -76,10 +76,13 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
 
     try {
       // 1. Create authoritative order on backend
+      const planIdentifier = plan.id || plan._id;
       const orderData = await orderService.createOrder({
-        pricingId: plan._id,
+        pricingId: planIdentifier,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       });
+
+      const orderRef = orderData.orderNumber || orderData.merchantTransactionId || orderData.orderId;
 
       // 2. Check if running in mock/simulated development mode
       const isSimulated =
@@ -103,7 +106,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
           })
         );
         onClose();
-        navigate(`/payment/success?orderRef=${orderData.merchantTransactionId}`);
+        navigate(`/payment/success?orderRef=${orderRef}`);
         return;
       }
 
@@ -113,7 +116,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
         amount: Math.round(orderData.amount * 100),
         currency: orderData.currency || 'INR',
         name: 'Coach Kush Fitness',
-        description: `${plan.title} - ${plan.sessions} Sessions Coaching`,
+        description: `${plan.title || plan.name} - ${plan.sessions} Sessions Coaching`,
         image: '/assets/logo/logo.svg',
         order_id: orderData.razorpayOrderId,
         handler: async function (response) {
@@ -127,7 +130,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
 
             dispatch(addToast({ type: 'success', message: 'Payment confirmed by Razorpay!' }));
             onClose();
-            navigate(`/payment/success?orderRef=${orderData.merchantTransactionId}`);
+            navigate(`/payment/success?orderRef=${orderRef}`);
           } catch (verifyErr) {
             dispatch(
               addToast({

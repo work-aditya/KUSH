@@ -24,6 +24,8 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+supabase/functions/.env
+supabase/.temp
 *.pem
 *.key
 *.crt
@@ -46,3 +48,6 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+.agents/
+.aider-desk/skills

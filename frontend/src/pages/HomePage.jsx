@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { pricingService } from '../services/pricingService';
+import { productService } from '../services/productService';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
@@ -30,6 +30,7 @@ import { FAQSection } from '../components/common/FAQSection';
 const DEFAULT_PLANS = [
   {
     _id: 'seed-1',
+    id: 1,
     title: 'Session 12 - Single',
     duration: '1 Month',
     sessions: 12,
@@ -47,6 +48,7 @@ const DEFAULT_PLANS = [
   },
   {
     _id: 'seed-2',
+    id: 2,
     title: 'Session 12 - Couple',
     duration: '1 Month',
     sessions: 12,
@@ -64,6 +66,7 @@ const DEFAULT_PLANS = [
   },
   {
     _id: 'seed-3',
+    id: 3,
     title: 'Session 24 - Single',
     duration: '2 Months',
     sessions: 24,
@@ -81,6 +84,7 @@ const DEFAULT_PLANS = [
   },
   {
     _id: 'seed-4',
+    id: 4,
     title: 'Session 24 - Couple',
     duration: '2 Months',
     sessions: 24,
@@ -103,10 +107,10 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const [pricingFilter, setPricingFilter] = useState('all'); // 'all', 'single', 'couple'
 
-  // Load active pricing plans from backend (fallback to DEFAULT_PLANS if loading or offline)
+  // Load active pricing plans from Supabase (fallback to DEFAULT_PLANS if loading or offline)
   const { data: serverPlans, isLoading: plansLoading } = useQuery({
     queryKey: ['pricing', 'active'],
-    queryFn: pricingService.getActivePlans,
+    queryFn: productService.getActivePlans,
     staleTime: 60 * 1000,
   });
 
@@ -345,7 +349,7 @@ export const HomePage = () => {
 
             return (
               <div
-                key={plan._id}
+                key={plan.id || plan._id}
                 className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-all duration-300 relative ${
                   isCouple
                     ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5 hover:-translate-y-1'
@@ -409,7 +413,7 @@ export const HomePage = () => {
                     variant={isCouple ? 'emerald' : 'primary'}
                     size="lg"
                     className="w-full text-xs font-bold uppercase tracking-wider gap-2 shadow-xl"
-                    onClick={() => handlePlanSelect(plan._id)}
+                    onClick={() => handlePlanSelect(plan.id || plan._id)}
                   >
                     {isAuthenticated ? 'Buy Now' : 'Login / Buy'}
                     <ArrowRight className="w-4 h-4" />

@@ -1,13 +1,9 @@
-import api from './api';
+import { productService } from './productService';
 
 export const pricingService = {
-  async getActivePlans() {
-    const res = await api.get('/pricing');
-    return res.data.data;
-  },
-
-  async getPlanById(id) {
-    const res = await api.get(`/pricing/${id}`);
-    return res.data.data;
-  },
+  getActivePlans: productService.getActivePlans,
+  getPlanById: productService.getPlanById,
+  getPlanBySlug: productService.getPlanBySlug,
 };
+
+export default pricingService;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { pricingService } from '../services/pricingService';
+import { productService } from '../services/productService';
 import { orderService } from '../services/orderService';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
@@ -31,10 +31,10 @@ export const PricingPage = () => {
   const [filter, setFilter] = useState('all'); // 'all', 'single', 'couple'
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState(null);
 
-  // Fetch active plans from MongoDB via backend REST API
+  // Fetch active plans from Supabase PostgreSQL
   const { data: plans = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['pricing', 'active'],
-    queryFn: pricingService.getActivePlans,
+    queryFn: productService.getActivePlans,
   });
 
   const handleCheckout = (plan) => {
@@ -123,7 +123,7 @@ export const PricingPage = () => {
 
             return (
               <div
-                key={plan._id}
+                key={plan.id || plan._id}
                 className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-all duration-300 relative ${
                   isCouple
                     ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5'

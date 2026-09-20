@@ -1,28 +1,124 @@
-import api from './api';
+import { supabase } from '../lib/supabaseClient';
+
+const formatUserData = async (authUser) => {
+  if (!authUser) return null;
+
+  // Query profile from PostgreSQL
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authUser.id)
+    .single();
+
+  // Query role from user_roles
+  const { data: userRole } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', authUser.id)
+    .single();
+
+  const roleName = userRole?.roles?.name || authUser.user_metadata?.role || 'customer';
+
+  return {
+    id: authUser.id,
+    _id: authUser.id,
+    email: authUser.email,
+    name: profile?.full_name || authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'Trainee',
+    phone: profile?.phone || authUser.user_metadata?.phone || '',
+    avatarUrl: profile?.avatar_url || '',
+    role: roleName,
+    isActive: profile?.is_active ?? true,
+    createdAt: profile?.created_at || authUser.created_at,
+  };
+};
 
 export const authService = {
-  async register(data) {
-    const res = await api.post('/auth/register', data);
-    return res.data.data;
+  // 1. Customer Sign Up with Supabase Auth
+  async register({ email, password, name, phone }) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          name,
+          phone,
+        },
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Registration failed');
+    }
+
+    if (!data.user) {
+      throw new Error('Registration succeeded, but no user was returned. Please verify your email.');
+    }
+
+    // Ensure profile contains name and phone
+    await supabase.from('profiles').upsert({
+      id: data.user.id,
+      full_name: name,
+      phone,
+      is_active: true,
+    });
+
+    const formattedUser = await formatUserData(data.user);
+    return { user: formattedUser, session: data.session };
   },
 
-  async login(credentials) {
-    const res = await api.post('/auth/login', credentials);
-    return res.data.data;
+  // 2. Customer Sign In with Supabase Auth
+  async login({ email, password }) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Invalid credentials');
+    }
+
+    const formattedUser = await formatUserData(data.user);
+    return { user: formattedUser, session: data.session };
   },
 
-  async adminLogin(credentials) {
-    const res = await api.post('/auth/admin-login', credentials);
-    return res.data.data;
+  // 3. Admin Authentication & Role Verification
+  async adminLogin({ email, password }) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Admin authentication failed');
+    }
+
+    const formattedUser = await formatUserData(data.user);
+
+    if (formattedUser.role !== 'admin') {
+      await supabase.auth.signOut();
+      throw new Error('Access denied. Administrator privileges required.');
+    }
+
+    return { user: formattedUser, session: data.session };
   },
 
+  // 4. Sign Out
   async logout() {
-    const res = await api.post('/auth/logout');
-    return res.data;
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.warn('Sign out warning:', error.message);
+    }
+    return { success: true };
   },
 
+  // 5. Retrieve current session user
   async getMe() {
-    const res = await api.get('/auth/me');
-    return res.data.data?.user;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return null;
+
+    return await formatUserData(session.user);
   },
 };
+
+export default authService;

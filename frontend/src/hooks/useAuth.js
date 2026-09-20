@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/authService';
+import { supabase } from '../lib/supabaseClient';
 import { setUser, clearUser, setLoading } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 
@@ -25,6 +26,22 @@ export const useAuth = () => {
       dispatch(clearUser());
     }
   }, [initialUser, isError, dispatch]);
+
+  // Supabase Auth State Change Listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const userObj = await authService.getMe();
+        if (userObj) dispatch(setUser(userObj));
+      } else if (event === 'SIGNED_OUT') {
+        dispatch(clearUser());
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [dispatch]);
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
@@ -85,3 +102,5 @@ export const useAuth = () => {
     logout: logoutMutation.mutateAsync,
   };
 };
+
+export default useAuth;
