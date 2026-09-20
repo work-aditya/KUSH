@@ -35,10 +35,12 @@ const formatUserData = async (authUser) => {
 export const authService = {
   // 1. Customer Sign Up with Supabase Auth
   async register({ email, password, name, phone }) {
+    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : 'https://kush-frontend.vercel.app/';
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectUrl,
         data: {
           full_name: name,
           name,

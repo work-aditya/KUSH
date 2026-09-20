@@ -33,6 +33,11 @@ export const useAuth = () => {
       if (session?.user) {
         const userObj = await authService.getMe();
         if (userObj) dispatch(setUser(userObj));
+
+        if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
+          dispatch(addToast({ type: 'success', message: 'Email verified successfully! Welcome to Coach Kush.' }));
+          window.history.replaceState(null, '', window.location.pathname);
+        }
       } else if (event === 'SIGNED_OUT') {
         dispatch(clearUser());
       }
