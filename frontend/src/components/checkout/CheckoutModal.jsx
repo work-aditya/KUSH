@@ -84,7 +84,20 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
 
       const orderRef = orderData.orderNumber || orderData.merchantTransactionId || orderData.orderId;
 
-      // 2. Check if running in mock/simulated development mode
+      // 2. Handle 100% discount / free orders
+      if (orderData.freeOrder) {
+        dispatch(
+          addToast({
+            type: 'success',
+            message: 'Membership activated successfully!',
+          })
+        );
+        onClose();
+        navigate(`/payment/success?orderRef=${orderRef}`);
+        return;
+      }
+
+      // 3. Check if running in mock/simulated development mode
       const isSimulated =
         orderData.razorpayOrderId?.startsWith('order_sim_') ||
         orderData.keyId === 'rzp_test_placeholder' ||

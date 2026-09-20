@@ -167,11 +167,51 @@ Deno.serve(async (req) => {
       subtotal: subtotal,
     });
 
-    if (itemError) {
-      throw new Error(`Failed to create order items: ${itemError.message}`);
+    // 6. Handle 100% Free / Zero Amount Orders (No Razorpay transaction required)
+    if (totalAmount <= 0) {
+      await supabase.from("orders").update({ status: "paid" }).eq("id", order.id);
+
+      await supabase.from("payments").insert({
+        order_id: order.id,
+        provider: "coupon",
+        razorpay_order_id: `free_${Date.now()}`,
+        amount: 0,
+        currency: "INR",
+        status: "captured",
+        paid_at: new Date().toISOString(),
+      });
+
+      await supabase.from("program_enrollments").insert({
+        customer_id: user.id,
+        product_id: product.id,
+        order_id: order.id,
+        start_date: new Date().toISOString().split("T")[0],
+        status: "active",
+      });
+
+      if (validatedCoupon) {
+        await supabase
+          .from("coupons")
+          .update({ used_count: (validatedCoupon.used_count || 0) + 1 })
+          .eq("id", validatedCoupon.id);
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          freeOrder: true,
+          orderId: order.id,
+          orderNumber: order.order_number,
+          razorpayOrderId: null,
+          amount: 0,
+          currency: "INR",
+          keyId: razorpayKeyId || "rzp_test_placeholder",
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // 6. Create Razorpay Order
+    // 7. Create Razorpay Order
     let razorpayOrderId = "";
     const isMock =
       !razorpayKeyId ||
