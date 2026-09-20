@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
-import { orderService } from '../services/orderService';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
@@ -14,20 +13,16 @@ import {
   CheckCircle,
   Video,
   ShieldCheck,
-  Zap,
   Users,
   User,
   ArrowRight,
   Loader2,
   Calendar,
 } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { addToast } from '../store/slices/uiSlice';
 
 export const PricingPage = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [filter, setFilter] = useState('all'); // 'all', 'single', 'couple'
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState(null);
 
@@ -119,7 +114,6 @@ export const PricingPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {filteredPlans.map((plan) => {
             const isCouple = plan.planType === 'couple';
-            const isProcessing = activeProcessingId === plan._id && checkoutMutation.isPending;
 
             return (
               <div
