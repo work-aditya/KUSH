@@ -92,7 +92,7 @@ export const DEFAULT_FALLBACK_PRODUCTS = [
     features: [
       '24 Joint Video Coaching Sessions',
       'Dual Transformation Periodization',
-      'Sync\'d Nutrition Strategy',
+      'Synchronized Nutrition Strategy',
       'Shared Milestone Tracking & Form Audits',
       'VIP WhatsApp Support with Kush',
     ],
@@ -141,7 +141,7 @@ export const productService = {
           product_images (id, image_url, alt_text, display_order, is_primary)
         `)
         .eq('is_active', true)
-        .order('id', { ascending: true });
+        .order('price', { ascending: true });
 
       if (error) {
         console.warn('Supabase getActivePlans warning:', error.message);

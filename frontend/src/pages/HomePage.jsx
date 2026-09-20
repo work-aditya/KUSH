@@ -95,7 +95,7 @@ const DEFAULT_PLANS = [
     features: [
       '24 Joint Video Coaching Sessions',
       'Dual Transformation Periodization',
-      'Sync\'d Nutrition Strategy',
+      'Synchronized Nutrition Strategy',
       'Shared Milestone Tracking & Form Audits',
       'VIP WhatsApp Support with Kush',
     ],

@@ -61,12 +61,15 @@ Deno.serve(async (req) => {
     }
 
     // 3. Authoritative product price lookup from PostgreSQL
-    const { data: product, error: prodError } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id", product_id)
-      .eq("is_active", true)
-      .single();
+    let productQuery = supabase.from("products").select("*").eq("is_active", true);
+    const isProductUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(product_id).trim());
+    if (isProductUUID) {
+      productQuery = productQuery.eq("id", String(product_id).trim());
+    } else {
+      productQuery = productQuery.eq("slug", String(product_id).trim());
+    }
+
+    const { data: product, error: prodError } = await productQuery.single();
 
     if (prodError || !product) {
       return new Response(
@@ -120,7 +123,20 @@ Deno.serve(async (req) => {
       "-" +
       Math.random().toString(36).substring(2, 6).toUpperCase();
 
-    // 5. Create Order and Order Items in PostgreSQL
+    // 5. Ensure profile exists for customer to satisfy foreign key
+    await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        full_name:
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          user.email?.split("@")[0] ||
+          "Client",
+      },
+      { onConflict: "id", ignoreDuplicates: true }
+    );
+
+    // 6. Create Order and Order Items in PostgreSQL
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({

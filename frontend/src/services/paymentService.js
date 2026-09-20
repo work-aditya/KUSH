@@ -85,10 +85,11 @@ export const paymentService = {
           order_items (id, product_name, unit_price, quantity, subtotal, product_id)
         `);
 
-      if (isNaN(Number(orderRefOrId))) {
-        query = query.eq('order_number', orderRefOrId);
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(orderRefOrId).trim());
+      if (isUUID) {
+        query = query.eq('id', String(orderRefOrId).trim());
       } else {
-        query = query.eq('id', orderRefOrId);
+        query = query.eq('order_number', String(orderRefOrId).trim());
       }
 
       const { data: order, error } = await query.single();
