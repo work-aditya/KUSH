@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
-import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 const registerSchema = z
   .object({
@@ -28,6 +28,8 @@ const registerSchema = z
 export const RegisterPage = () => {
   const { register: registerUser, isRegistering } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -39,8 +41,12 @@ export const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      await registerUser(data);
-      navigate('/pricing');
+      const res = await registerUser(data);
+      if (res?.requiresEmailVerification) {
+        navigate('/login', { state: { emailVerificationNotice: true, email: data.email } });
+      } else {
+        navigate('/pricing');
+      }
     } catch (err) {
       // Toast displayed via useAuth
     }
@@ -70,7 +76,7 @@ export const RegisterPage = () => {
               <User className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
                 type="text"
-                placeholder="Rahul Sharma"
+                placeholder="ENTER FULL NAME"
                 {...register('name')}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
@@ -88,7 +94,7 @@ export const RegisterPage = () => {
               <Mail className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="ENTER EMAIL"
                 {...register('email')}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
@@ -106,7 +112,7 @@ export const RegisterPage = () => {
               <Phone className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
                 type="tel"
-                placeholder="9876543210"
+                placeholder="PHONE NUMBER"
                 {...register('phone')}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
@@ -124,11 +130,19 @@ export const RegisterPage = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
                 <input
-                  type="password"
-                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="PASSWORD"
                   {...register('password')}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 text-brand-muted hover:text-white transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {errors.password && (
                 <p className="text-[11px] text-red-400 mt-1">{errors.password.message}</p>
@@ -142,11 +156,19 @@ export const RegisterPage = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
                 <input
-                  type="password"
-                  placeholder="••••••••"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="CONFIRM PASSWORD"
                   {...register('confirmPassword')}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3.5 text-brand-muted hover:text-white transition-colors"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {errors.confirmPassword && (
                 <p className="text-[11px] text-red-400 mt-1">{errors.confirmPassword.message}</p>

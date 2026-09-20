@@ -34,7 +34,7 @@ export const PricingPage = () => {
 
   const handleCheckout = (plan) => {
     if (!isAuthenticated) {
-      navigate('/login', { state: { returnTo: '/pricing' } });
+      navigate('/register', { state: { returnTo: '/pricing' } });
       return;
     }
     setSelectedPlanForCheckout(plan);
@@ -183,7 +183,7 @@ export const PricingPage = () => {
                     className="w-full text-sm font-bold uppercase tracking-wider gap-2 shadow-xl"
                     onClick={() => handleCheckout(plan)}
                   >
-                    {isAuthenticated ? 'Enroll / Buy Now' : 'Login to Enroll'}
+                    {isAuthenticated ? 'Enroll / Buy Now' : 'Sign Up to Enroll'}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">

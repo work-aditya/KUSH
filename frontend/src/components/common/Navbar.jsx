@@ -131,9 +131,9 @@ export const Navbar = () => {
                   Log In
                 </Button>
               </Link>
-              <Link to="/pricing">
+              <Link to="/register">
                 <Button variant="primary" size="sm">
-                  Start Coaching
+                  Sign Up
                 </Button>
               </Link>
             </div>
@@ -216,9 +216,9 @@ export const Navbar = () => {
                     Log In
                   </Button>
                 </Link>
-                <Link to="/pricing" onClick={() => setMobileOpen(false)}>
+                <Link to="/register" onClick={() => setMobileOpen(false)}>
                   <Button variant="primary" size="md" className="w-full">
-                    Start
+                    Sign Up
                   </Button>
                 </Link>
               </div>

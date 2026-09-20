@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
-import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Eye, EyeOff, Info } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email or username is required'),
+  email: z.string().min(1, 'Email is required'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -16,8 +16,11 @@ export const LoginPage = () => {
   const { login, isLoggingIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const returnTo = location.state?.from?.pathname || location.state?.returnTo || '/';
+  const emailVerificationNotice = location.state?.emailVerificationNotice;
+  const registeredEmail = location.state?.email;
 
   const {
     register,
@@ -25,6 +28,9 @@ export const LoginPage = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: registeredEmail || '',
+    },
   });
 
   const onSubmit = async (data) => {
@@ -55,6 +61,18 @@ export const LoginPage = () => {
           </p>
         </div>
 
+        {emailVerificationNotice && (
+          <div className="p-4 rounded-2xl bg-brand-accent/10 border border-brand-accent/30 flex items-start gap-3 text-xs text-brand-accent">
+            <Info className="w-4 h-4 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Verification link sent!</p>
+              <p className="text-brand-muted mt-0.5">
+                We sent a confirmation link to <span className="text-white font-medium">{registeredEmail}</span>. Please verify your email before logging in.
+              </p>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">
@@ -64,7 +82,7 @@ export const LoginPage = () => {
               <Mail className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
                 type="email"
-                placeholder="name@example.com"
+                placeholder="ENTER EMAIL"
                 {...register('email')}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
@@ -75,17 +93,33 @@ export const LoginPage = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider">
+                Password
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-brand-accent hover:underline font-semibold"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <div className="relative">
               <Lock className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
-                type="password"
-                placeholder="••••••••"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="PASSWORD"
                 {...register('password')}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
+                className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3.5 text-brand-muted hover:text-white transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
             {errors.password && (
               <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>

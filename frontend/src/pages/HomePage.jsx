@@ -415,7 +415,7 @@ export const HomePage = () => {
                     className="w-full text-xs font-bold uppercase tracking-wider gap-2 shadow-xl"
                     onClick={() => handlePlanSelect(plan.id || plan._id)}
                   >
-                    {isAuthenticated ? 'Buy Now' : 'Login / Buy'}
+                    {isAuthenticated ? 'Buy Now' : 'Sign Up to Buy'}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2.5 flex items-center justify-center gap-1">

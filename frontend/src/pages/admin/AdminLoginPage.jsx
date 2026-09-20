@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
-import { ShieldCheck, Lock, User, ArrowLeft, KeyRound } from 'lucide-react';
+import { ShieldCheck, Lock, User, ArrowLeft, KeyRound, Eye, EyeOff } from 'lucide-react';
 
 const adminLoginSchema = z.object({
   email: z.string().min(1, 'Administrator username or email is required'),
@@ -16,6 +16,7 @@ export const AdminLoginPage = () => {
   const { adminLogin, isAdminLoggingIn, isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const returnTo = location.state?.from?.pathname || '/admin';
 
@@ -79,7 +80,7 @@ export const AdminLoginPage = () => {
                 <input
                   type="text"
                   autoComplete="username"
-                  placeholder="admin or admin@coachkush.internal"
+                  placeholder="ENTER EMAIL"
                   {...register('email')}
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
@@ -96,12 +97,20 @@ export const AdminLoginPage = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  placeholder="••••••••••••"
+                  placeholder="PASSWORD"
                   {...register('password')}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 text-brand-muted hover:text-white transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {errors.password && (
                 <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>

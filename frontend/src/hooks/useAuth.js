@@ -63,7 +63,13 @@ export const useAuth = () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     },
     onError: (err) => {
-      dispatch(addToast({ type: 'error', message: err.message || 'Registration failed' }));
+      let msg = err.message || 'Registration failed';
+      if (msg === 'Failed to fetch') {
+        msg = 'Unable to connect to authentication server. Please check your network connection.';
+      } else if (msg.includes('rate limit')) {
+        msg = 'Email rate limit reached on auth server. Please wait a few minutes or try again later.';
+      }
+      dispatch(addToast({ type: 'error', message: msg }));
     },
   });
 
@@ -88,6 +94,32 @@ export const useAuth = () => {
     },
   });
 
+  const forgotPasswordMutation = useMutation({
+    mutationFn: authService.forgotPassword,
+    onSuccess: () => {
+      dispatch(addToast({ type: 'success', message: 'Password reset link sent! Please check your email inbox.' }));
+    },
+    onError: (err) => {
+      const msg = err.message === 'Failed to fetch'
+        ? 'Unable to connect to server. Please check your internet connection.'
+        : err.message || 'Failed to send reset email';
+      dispatch(addToast({ type: 'error', message: msg }));
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: authService.resetPassword,
+    onSuccess: () => {
+      dispatch(addToast({ type: 'success', message: 'Password updated successfully! You can now sign in.' }));
+    },
+    onError: (err) => {
+      const msg = err.message === 'Failed to fetch'
+        ? 'Unable to connect to server. Please check your internet connection.'
+        : err.message || 'Failed to update password';
+      dispatch(addToast({ type: 'error', message: msg }));
+    },
+  });
+
   return {
     user,
     isAuthenticated,
@@ -100,6 +132,10 @@ export const useAuth = () => {
     register: registerMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
     logout: logoutMutation.mutateAsync,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    isSendingResetLink: forgotPasswordMutation.isPending,
+    resetPassword: resetPasswordMutation.mutateAsync,
+    isResettingPassword: resetPasswordMutation.isPending,
   };
 };
 

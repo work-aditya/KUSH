@@ -55,16 +55,26 @@ export const authService = {
       throw new Error('Registration succeeded, but no user was returned. Please verify your email.');
     }
 
-    // Ensure profile contains name and phone
-    await supabase.from('profiles').upsert({
-      id: data.user.id,
-      full_name: name,
-      phone,
-      is_active: true,
-    });
+    // Safely upsert profile if session exists
+    if (data.session) {
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          full_name: name,
+          phone,
+          is_active: true,
+        });
+      } catch (profileErr) {
+        console.warn('Profile upsert warning:', profileErr);
+      }
+    }
 
     const formattedUser = await formatUserData(data.user);
-    return { user: formattedUser, session: data.session };
+    return {
+      user: formattedUser,
+      session: data.session,
+      requiresEmailVerification: !data.session,
+    };
   },
 
   // 2. Customer Sign In with Supabase Auth
@@ -118,6 +128,29 @@ export const authService = {
     if (!session?.user) return null;
 
     return await formatUserData(session.user);
+  },
+
+  // 6. Request Password Reset Link
+  async forgotPassword(email) {
+    const redirectUrl = `${window.location.origin}/reset-password`;
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    if (error) {
+      throw new Error(error.message || 'Failed to send password reset email');
+    }
+    return data;
+  },
+
+  // 7. Update / Reset Password
+  async resetPassword(newPassword) {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) {
+      throw new Error(error.message || 'Failed to update password');
+    }
+    return data;
   },
 };
 
