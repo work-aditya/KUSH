@@ -3,33 +3,48 @@ import { supabase } from '../lib/supabaseClient';
 const formatUserData = async (authUser) => {
   if (!authUser) return null;
 
-  // Query profile from PostgreSQL
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', authUser.id)
-    .single();
+  try {
+    // Query profile from PostgreSQL
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle();
 
-  // Query role from user_roles
-  const { data: userRole } = await supabase
-    .from('user_roles')
-    .select('roles(name)')
-    .eq('user_id', authUser.id)
-    .single();
+    // Query role from user_roles
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('roles(name)')
+      .eq('user_id', authUser.id)
+      .maybeSingle();
 
-  const roleName = userRole?.roles?.name || authUser.user_metadata?.role || 'customer';
+    const roleName = userRole?.roles?.name || authUser.user_metadata?.role || 'customer';
 
-  return {
-    id: authUser.id,
-    _id: authUser.id,
-    email: authUser.email,
-    name: profile?.full_name || authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'Trainee',
-    phone: profile?.phone || authUser.user_metadata?.phone || '',
-    avatarUrl: profile?.avatar_url || '',
-    role: roleName,
-    isActive: profile?.is_active ?? true,
-    createdAt: profile?.created_at || authUser.created_at,
-  };
+    return {
+      id: authUser.id,
+      _id: authUser.id,
+      email: authUser.email,
+      name: profile?.full_name || authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'Trainee',
+      phone: profile?.phone || authUser.user_metadata?.phone || '',
+      avatarUrl: profile?.avatar_url || '',
+      role: roleName,
+      isActive: profile?.is_active ?? true,
+      createdAt: profile?.created_at || authUser.created_at,
+    };
+  } catch (err) {
+    console.warn('formatUserData fallback:', err);
+    return {
+      id: authUser.id,
+      _id: authUser.id,
+      email: authUser.email,
+      name: authUser.user_metadata?.full_name || 'Trainee',
+      phone: authUser.user_metadata?.phone || '',
+      avatarUrl: '',
+      role: authUser.user_metadata?.role || 'customer',
+      isActive: true,
+      createdAt: authUser.created_at,
+    };
+  }
 };
 
 export const authService = {

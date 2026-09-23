@@ -12,7 +12,7 @@ export const useAuth = () => {
   const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
 
   // Initial user fetch
-  const { data: initialUser, isError } = useQuery({
+  const { data: initialUser, isFetched, isError } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: authService.getMe,
     retry: false,
@@ -22,24 +22,30 @@ export const useAuth = () => {
   useEffect(() => {
     if (initialUser) {
       dispatch(setUser(initialUser));
-    } else if (isError) {
+    } else if (isFetched || isError) {
       dispatch(clearUser());
     }
-  }, [initialUser, isError, dispatch]);
+  }, [initialUser, isFetched, isError, dispatch]);
 
   // Supabase Auth State Change Listener
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const userObj = await authService.getMe();
-        if (userObj) dispatch(setUser(userObj));
+        if (userObj) {
+          dispatch(setUser(userObj));
+        } else {
+          dispatch(clearUser());
+        }
 
         if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
           dispatch(addToast({ type: 'success', message: 'Email verified successfully! Welcome to Coach Kush.' }));
           window.history.replaceState(null, '', window.location.pathname);
         }
-      } else if (event === 'SIGNED_OUT') {
-        dispatch(clearUser());
+      } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+        if (!session?.user) {
+          dispatch(clearUser());
+        }
       }
     });
 
