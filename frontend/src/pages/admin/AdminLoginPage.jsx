@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
-import { ShieldCheck, Lock, User, ArrowLeft, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Lock, User, ArrowLeft, KeyRound, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const adminLoginSchema = z.object({
   email: z.string().min(1, 'Administrator username or email is required'),
@@ -17,6 +17,7 @@ export const AdminLoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   const returnTo = location.state?.from?.pathname || '/admin';
 
@@ -35,11 +36,17 @@ export const AdminLoginPage = () => {
   });
 
   const onSubmit = async (data) => {
+    setAuthError('');
     try {
-      await adminLogin(data);
-      navigate(returnTo, { replace: true });
+      const res = await adminLogin({
+        email: data.email.trim(),
+        password: data.password,
+      });
+      if (res?.user?.role === 'admin') {
+        navigate(returnTo, { replace: true });
+      }
     } catch (err) {
-      // Toast notification is automatically dispatched by useAuth
+      setAuthError(err.message || 'Admin authentication failed. Please verify credentials.');
     }
   };
 
@@ -71,6 +78,12 @@ export const AdminLoginPage = () => {
         {/* Login Form Card */}
         <div className="glass-card rounded-3xl p-8 sm:p-10 border border-brand-border shadow-2xl space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {authError && (
+              <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-xs flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{authError}</span>
+              </div>
+            )}
             <div>
               <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">
                 Admin Username or Email

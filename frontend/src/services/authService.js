@@ -1,50 +1,85 @@
 import { supabase } from '../lib/supabaseClient';
 
+const ADMIN_ROLE_ID = '22b2bf47-cdc5-413b-a67c-ebe9ab657981';
+
 const formatUserData = async (authUser) => {
   if (!authUser) return null;
 
+  let roleName = 'customer';
+
   try {
-    // Query profile from PostgreSQL
-    const { data: profile } = await supabase
+    // 1. Authoritative RPC check (Postgres SECURITY DEFINER function is_admin)
+    try {
+      const { data: isAdm } = await supabase.rpc('is_admin');
+      if (isAdm === true) {
+        roleName = 'admin';
+      }
+    } catch {
+      // ignore RPC error and continue to table query
+    }
+
+    // 2. Query all roles from user_roles (Array lookup, not maybeSingle to support multi-role accounts)
+    if (roleName !== 'admin') {
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('role_id, roles(name)')
+        .eq('user_id', authUser.id);
+
+      const assignedRoleNames = (userRoles || [])
+        .map((ur) => ur.roles?.name || (ur.role_id === ADMIN_ROLE_ID ? 'admin' : null))
+        .filter(Boolean);
+
+      if (
+        assignedRoleNames.includes('admin') ||
+        (userRoles || []).some((ur) => ur.role_id === ADMIN_ROLE_ID) ||
+        authUser.user_metadata?.role === 'admin' ||
+        authUser.app_metadata?.role === 'admin'
+      ) {
+        roleName = 'admin';
+      } else if (
+        assignedRoleNames.includes('staff') ||
+        authUser.user_metadata?.role === 'staff'
+      ) {
+        roleName = 'staff';
+      } else if (assignedRoleNames.length > 0) {
+        roleName = assignedRoleNames[0];
+      }
+    }
+  } catch (err) {
+    console.warn('Role check fallback:', err);
+    if (authUser.user_metadata?.role === 'admin' || authUser.app_metadata?.role === 'admin') {
+      roleName = 'admin';
+    }
+  }
+
+  // Profile lookup
+  let profile = null;
+  try {
+    const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authUser.id)
       .maybeSingle();
-
-    // Query role from user_roles
-    const { data: userRole } = await supabase
-      .from('user_roles')
-      .select('roles(name)')
-      .eq('user_id', authUser.id)
-      .maybeSingle();
-
-    const roleName = userRole?.roles?.name || authUser.user_metadata?.role || 'customer';
-
-    return {
-      id: authUser.id,
-      _id: authUser.id,
-      email: authUser.email,
-      name: profile?.full_name || authUser.user_metadata?.full_name || authUser.user_metadata?.name || 'Trainee',
-      phone: profile?.phone || authUser.user_metadata?.phone || '',
-      avatarUrl: profile?.avatar_url || '',
-      role: roleName,
-      isActive: profile?.is_active ?? true,
-      createdAt: profile?.created_at || authUser.created_at,
-    };
+    profile = data;
   } catch (err) {
-    console.warn('formatUserData fallback:', err);
-    return {
-      id: authUser.id,
-      _id: authUser.id,
-      email: authUser.email,
-      name: authUser.user_metadata?.full_name || 'Trainee',
-      phone: authUser.user_metadata?.phone || '',
-      avatarUrl: '',
-      role: authUser.user_metadata?.role || 'customer',
-      isActive: true,
-      createdAt: authUser.created_at,
-    };
+    // ignore
   }
+
+  return {
+    id: authUser.id,
+    _id: authUser.id,
+    email: authUser.email,
+    name:
+      profile?.full_name ||
+      authUser.user_metadata?.full_name ||
+      authUser.user_metadata?.name ||
+      'Trainee',
+    phone: profile?.phone || authUser.user_metadata?.phone || '',
+    avatarUrl: profile?.avatar_url || '',
+    role: roleName,
+    isActive: profile?.is_active ?? true,
+    createdAt: profile?.created_at || authUser.created_at,
+  };
 };
 
 export const authService = {
