@@ -1,6 +1,8 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { MessageCircle } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { settingsService } from '../../services/settingsService';
 
 export const WhatsAppButton = ({
   className,
@@ -8,8 +10,15 @@ export const WhatsAppButton = ({
   text = 'Chat with Kush on WhatsApp',
   variant = 'default', // 'default', 'floating', 'compact'
 }) => {
+  const { data: settings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: settingsService.getSiteSettings,
+    staleTime: 60 * 1000,
+  });
+
   const whatsappUrl =
     url ||
+    settings?.whatsapp_url ||
     import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
     'https://wa.me/917042858524';
 
@@ -48,3 +57,5 @@ export const WhatsAppButton = ({
     </a>
   );
 };
+
+export default WhatsAppButton;

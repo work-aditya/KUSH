@@ -36,7 +36,7 @@ export const AdminLayout = () => {
     { name: 'Orders & Payments', path: '/admin/orders', icon: ShoppingBag },
     { name: 'Users Directory', path: '/admin/users', icon: Users },
     { name: 'Contact Inquiries', path: '/admin/messages', icon: MessageSquare },
-    { name: 'System Settings', path: '/admin/settings', icon: Settings },
+    { name: 'Site & Footer Settings', path: '/admin/settings', icon: Settings },
   ];
 
   return (
