@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { getAuthRedirectUrl } from '../utils/domain';
 
 const ADMIN_ROLE_ID = '22b2bf47-cdc5-413b-a67c-ebe9ab657981';
 
@@ -85,7 +86,7 @@ const formatUserData = async (authUser) => {
 export const authService = {
   // 1. Customer Sign Up with Supabase Auth
   async register({ email, password, name, phone }) {
-    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : 'https://kush-frontend.vercel.app/';
+    const redirectUrl = getAuthRedirectUrl('/');
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -184,7 +185,7 @@ export const authService = {
 
   // 6. Request Password Reset Link
   async forgotPassword(email) {
-    const redirectUrl = `${window.location.origin}/reset-password`;
+    const redirectUrl = getAuthRedirectUrl('/reset-password');
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });

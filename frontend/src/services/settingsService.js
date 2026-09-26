@@ -6,7 +6,7 @@ export const DEFAULT_SETTINGS = {
   id: 'general',
   whatsapp_number: '+91 70428 58524',
   whatsapp_url: import.meta.env.VITE_WHATSAPP_CONTACT_URL || 'https://wa.me/917042858524',
-  instagram_url: 'https://instagram.com/coachkush',
+  instagram_url: 'https://instagram.com/coachhkush',
   youtube_url: '',
   email: 'support@coachkush.com',
   phone: '+91 70428 58524',
@@ -25,7 +25,14 @@ export const settingsService = {
     let cached = null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) cached = JSON.parse(raw);
+      if (raw) {
+        cached = JSON.parse(raw);
+        // Automatically migrate legacy instagram url if present
+        if (cached.instagram_url === 'https://instagram.com/coachkush') {
+          cached.instagram_url = 'https://instagram.com/coachhkush';
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
+        }
+      }
     } catch {
       // ignore JSON parse issue
     }
@@ -39,6 +46,10 @@ export const settingsService = {
 
       if (!error && data) {
         const merged = { ...DEFAULT_SETTINGS, ...data };
+        // Migrate legacy instagram url if returned from db
+        if (merged.instagram_url === 'https://instagram.com/coachkush') {
+          merged.instagram_url = 'https://instagram.com/coachhkush';
+        }
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
         } catch {
@@ -50,7 +61,11 @@ export const settingsService = {
       console.warn('site_settings lookup warning:', err.message);
     }
 
-    return cached || DEFAULT_SETTINGS;
+    if (cached) {
+      return cached;
+    }
+
+    return DEFAULT_SETTINGS;
   },
 
   /**

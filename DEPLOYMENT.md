@@ -78,7 +78,24 @@ supabase functions list
    - `VITE_SUPABASE_PUBLISHABLE_KEY`: `YOUR_SUPABASE_ANON_KEY`
    - `VITE_RAZORPAY_KEY_ID`: `rzp_live_xxxxxxxx`
    - `VITE_WHATSAPP_CONTACT_URL`: `https://wa.me/917042858524`
-3. Deploy! Vercel will automatically run `npm run build` producing the production bundle in `frontend/dist`.
+3. Deploy! Vercel will automatically run `npm run build` producing the production bundle in `dist`.
+
+### 7. Configure Custom Domain (cochkush.in)
+1. In your **Vercel Dashboard** > **Project Settings** > **Domains**:
+   - Add `cochkush.in` (Recommended: Redirect `cochkush.in` to `www.cochkush.in` or vice versa)
+   - Add `www.cochkush.in`
+2. Configure DNS Records with your domain registrar:
+   - **Type A**: `@` -> `76.76.21.21` (Vercel IP)
+   - **Type CNAME**: `www` -> `cname.vercel-dns.com`
+3. In **Supabase Dashboard** > **Authentication** > **URL Configuration**:
+   - Set **Site URL**: `https://cochkush.in`
+   - Add to **Redirect URLs**:
+     - `https://cochkush.in/**`
+     - `https://www.cochkush.in/**`
+     - `https://*.vercel.app/**`
+     - `http://localhost:5173/**`
+4. Social Media:
+   - Official Instagram handle: `https://instagram.com/coachhkush` (@coachhkush)
 
 ---
 

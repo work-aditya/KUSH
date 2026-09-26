@@ -10,12 +10,33 @@
     <title>CoachKush | Elite 1-on-1 Online Fitness & Coaching Platform</title>
     <meta name="title" content="CoachKush | Elite 1-on-1 Online Fitness & Coaching Platform" />
     <meta name="description" content="Transform your physique, health, and mindset with Coach Kush. Interactive live 1-on-1 and couple coaching sessions delivered directly over Google Meet and Zoom." />
+    <link rel="canonical" id="canonical-url" href="https://cochkush.in/" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://coachkush.com/" />
+    <meta property="og:url" id="og-url" content="https://cochkush.in/" />
     <meta property="og:title" content="CoachKush | Elite Online Coaching" />
     <meta property="og:description" content="Interactive live 1-on-1 and couple fitness coaching sessions with Coach Kush via Google Meet and Zoom." />
+    <meta property="og:image" content="https://cochkush.in/assets/logo/logo.svg" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CoachKush | Elite Online Coaching" />
+    <meta name="twitter:description" content="Transform your physique, health, and mindset with Coach Kush. Live 1-on-1 interactive coaching." />
+    <meta name="twitter:image" content="https://cochkush.in/assets/logo/logo.svg" />
+
+    <!-- Dynamic Domain & Canonical Head Script -->
+    <script type="text/javascript">
+      (function() {
+        try {
+          var origin = window.location.origin;
+          var canonical = document.getElementById('canonical-url');
+          if (canonical) canonical.setAttribute('href', origin + window.location.pathname);
+          var ogUrl = document.getElementById('og-url');
+          if (ogUrl) ogUrl.setAttribute('content', origin + window.location.pathname);
+        } catch (e) {}
+      })();
+    </script>
     
     <!-- Preconnect Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

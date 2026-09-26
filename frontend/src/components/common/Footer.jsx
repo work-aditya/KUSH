@@ -25,7 +25,7 @@ export const Footer = () => {
     import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
     'https://wa.me/917042858524';
   const whatsappNumber = settings?.whatsapp_number || '+91 70428 58524';
-  const instagramUrl = settings?.instagram_url || 'https://instagram.com/coachkush';
+  const instagramUrl = settings?.instagram_url || 'https://instagram.com/coachhkush';
   const youtubeUrl = settings?.youtube_url;
   const supportEmail = settings?.email || 'support@coachkush.com';
   const tagline =
@@ -35,10 +35,10 @@ export const Footer = () => {
     settings?.footer_copyright ||
     'CoachKush. All rights reserved. Designed for elite performance & online accountability.';
 
-  // Extract handle for Instagram display (e.g., @coachkush)
+  // Extract handle for Instagram display (e.g., @coachhkush)
   const instagramHandle = instagramUrl
     ? '@' + instagramUrl.replace(/\/$/, '').split('/').pop().replace('@', '')
-    : '@coachkush';
+    : '@coachhkush';
 
   return (
     <footer className="border-t border-brand-border bg-brand-card/60 text-brand-muted">

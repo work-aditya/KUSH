@@ -1,0 +1,8 @@
+# CoachKush robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /payment/
+
+Sitemap: https://cochkush.in/sitemap.xml

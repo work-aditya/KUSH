@@ -183,7 +183,7 @@ export const AdminSettings = () => {
                     required
                     value={formData.instagram_url || ''}
                     onChange={handleChange}
-                    placeholder="https://instagram.com/coachkush"
+                    placeholder="https://instagram.com/coachhkush"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-brand-surface border border-brand-border text-white text-xs focus:outline-none focus:border-brand-accent transition-colors font-mono"
                   />
                   <p className="text-[11px] text-brand-darkMuted">
