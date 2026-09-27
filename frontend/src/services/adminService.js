@@ -95,11 +95,14 @@ export const adminService = {
       slug: p.slug,
       planType: (p.plan_type || '').includes('couple') ? 'couple' : 'single',
       price: Number(p.price),
-      duration: p.duration_months ? `${p.duration_months} Month${p.duration_months > 1 ? 's' : ''}` : '1 Month',
+      duration: p.duration || (p.duration_months ? `${p.duration_months} Month${p.duration_months > 1 ? 's' : ''}` : '4 Weeks'),
       sessions: p.sessions,
       description: p.description,
-      features: (p.product_features || []).map((f) => f.feature_text),
+      features: (p.product_features || [])
+        .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+        .map((f) => f.feature_text),
       isActive: p.is_active,
+      active: p.is_active,
       highlighted: p.highlighted,
     }));
   },
@@ -113,13 +116,14 @@ export const adminService = {
       .insert({
         name: plan.title,
         slug,
-        plan_type: isCouple ? 'couple-partner' : '1-on-1-single',
+        plan_type: isCouple ? 'couple' : 'single',
         description: plan.description,
         price: Number(plan.price),
         currency: 'INR',
+        duration: plan.duration || '4 Weeks',
         duration_months: parseInt(plan.duration, 10) || 1,
-        sessions: parseInt(plan.sessions, 10) || 12,
-        is_active: plan.isActive ?? true,
+        sessions: parseInt(plan.sessions, 10) || 4,
+        is_active: plan.active !== undefined ? plan.active : (plan.isActive ?? true),
         highlighted: plan.highlighted ?? false,
       })
       .select()
@@ -141,18 +145,21 @@ export const adminService = {
 
   async updatePricingPlan(id, plan) {
     const isCouple = plan.planType === 'couple';
+    const updateData = {
+      name: plan.title,
+      plan_type: isCouple ? 'couple' : 'single',
+      description: plan.description,
+      price: Number(plan.price),
+      duration: plan.duration || '4 Weeks',
+      duration_months: parseInt(plan.duration, 10) || 1,
+      sessions: parseInt(plan.sessions, 10) || 4,
+      is_active: plan.active !== undefined ? plan.active : (plan.isActive ?? true),
+      highlighted: plan.highlighted ?? false,
+    };
+
     const { data: prod, error } = await supabase
       .from('products')
-      .update({
-        name: plan.title,
-        plan_type: isCouple ? 'couple-partner' : '1-on-1-single',
-        description: plan.description,
-        price: Number(plan.price),
-        duration_months: parseInt(plan.duration, 10) || 1,
-        sessions: parseInt(plan.sessions, 10) || 12,
-        is_active: plan.isActive ?? true,
-        highlighted: plan.highlighted ?? false,
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();

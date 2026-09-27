@@ -14,6 +14,11 @@
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:db:push": "npx supabase db push",
-    "supabase:functions:serve": "npx supabase functions serve --env-file supabase/functions/.env"
+    "supabase:functions:serve": "npx supabase functions serve --env-file supabase/functions/.env",
+    "email:welcome": "node scripts/send-welcome-email.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.4",
+    "resend": "^6.30.0"
   }
 }

@@ -42,11 +42,14 @@ export const orderService = {
     // 2. Fetch product price if pricingId is provided
     let basePrice = 8999;
     if (pricingId) {
-      const { data: prod } = await supabase
-        .from('products')
-        .select('price')
-        .eq('id', pricingId)
-        .single();
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(pricingId).trim());
+      let query = supabase.from('products').select('price');
+      if (isUUID) {
+        query = query.eq('id', String(pricingId).trim());
+      } else {
+        query = query.eq('slug', String(pricingId).trim());
+      }
+      const { data: prod } = await query.single();
       if (prod?.price) {
         basePrice = Number(prod.price);
       }

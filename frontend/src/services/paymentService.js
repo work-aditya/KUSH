@@ -20,11 +20,24 @@ export const paymentService = {
       // Fallback: If edge function not yet deployed, provide simulated order for local dev
       if (error.message?.includes('Failed to send') || error.message?.includes('Function not found') || error.status === 404) {
         console.warn('Edge Function create-razorpay-order unreachable. Falling back to local simulator.');
+        let simulatedAmount = 8999;
+        try {
+          const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(productId).trim());
+          let pQuery = supabase.from('products').select('price');
+          if (isUUID) {
+            pQuery = pQuery.eq('id', String(productId).trim());
+          } else {
+            pQuery = pQuery.eq('slug', String(productId).trim());
+          }
+          const { data: p } = await pQuery.single();
+          if (p?.price) simulatedAmount = Number(p.price);
+        } catch (_) {}
+
         return {
           orderId: `sim_${Date.now()}`,
           orderNumber: `CK-SIM-${Date.now().toString(36).toUpperCase()}`,
           razorpayOrderId: `order_sim_${Date.now()}`,
-          amount: 8999,
+          amount: simulatedAmount,
           currency: 'INR',
           keyId: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
         };

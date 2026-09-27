@@ -29,9 +29,61 @@ import { FAQSection } from '../components/common/FAQSection';
 
 const DEFAULT_PLANS = [
   {
+    _id: 'custom-workout-plan',
+    id: 'custom-workout-plan',
+    title: 'Custom Workout Plan',
+    name: 'Custom Workout Plan',
+    slug: 'custom-workout-plan',
+    duration: '4 Weeks',
+    sessions: 4,
+    planType: 'single',
+    price: 5999,
+    currency: 'INR',
+    description: 'Tailored training program customized to your equipment, goals, and experience with exercise video cues.',
+    features: [
+      'Personalized workout plan',
+      'Home / Gym workout options',
+      'Goal-based training',
+      'Progressive workout structure',
+      'Weekly workout adjustments',
+      'Exercise form/video guidance',
+      'Workout duration planning',
+      'Injury/limitation considerations',
+      'Weekly schedule',
+      'WhatsApp support',
+    ],
+  },
+  {
+    _id: 'diet-plan',
+    id: 'diet-plan',
+    title: 'Diet Plan',
+    name: 'Diet Plan',
+    slug: 'diet-plan',
+    duration: '4 Weeks',
+    sessions: 4,
+    planType: 'single',
+    price: 7999,
+    currency: 'INR',
+    description: 'Personalized nutrition plan with custom meal options, macro targets, and ongoing diet adjustments.',
+    features: [
+      'Personalized diet plan',
+      'Vegetarian / Non-Vegetarian options',
+      'Custom meal plan based on preferences',
+      'Weekly diet adjustments',
+      'Calorie & macro-based planning',
+      'Food allergy/intolerance consideration',
+      'Meal timing guidance',
+      'Hydration guidance',
+      'Practical meal/substitution options',
+      'WhatsApp support',
+    ],
+  },
+  {
     _id: 'seed-1',
     id: 1,
     title: 'Session 12 - Single',
+    name: 'Session 12 - Single',
+    slug: 'session-12-single',
     duration: '1 Month',
     sessions: 12,
     planType: 'single',
@@ -39,17 +91,20 @@ const DEFAULT_PLANS = [
     currency: 'INR',
     description: '12 high-intensity 1-on-1 virtual personal training sessions via Google Meet or Zoom.',
     features: [
-      '12 Live 1-on-1 Video Sessions',
-      'Personalized Workout Program',
-      'Nutrition & Calorie Guidance',
-      'Weekly Form Review & Adjustments',
-      'Direct WhatsApp Support with Kush',
+      '12 Live 1-on-1 video sessions',
+      'Real-time form cues & posture correction',
+      'Personalized workout program',
+      'Nutrition & calorie guidance',
+      'Weekly form review & adjustments',
+      'Direct WhatsApp support with Kush',
     ],
   },
   {
     _id: 'seed-2',
     id: 2,
     title: 'Session 12 - Couple',
+    name: 'Session 12 - Couple',
+    slug: 'session-12-couple',
     duration: '1 Month',
     sessions: 12,
     planType: 'couple',
@@ -57,17 +112,20 @@ const DEFAULT_PLANS = [
     currency: 'INR',
     description: '12 live interactive partner coaching sessions for couples or workout partners.',
     features: [
-      '12 Joint Video Sessions',
-      'Custom Programs for Both Individuals',
-      'Dual Nutrition & Habit Tracking',
-      'Partner Motivation & Accountability',
-      'Dedicated WhatsApp Group with Kush',
+      '12 Live interactive couple sessions',
+      'Custom programs for both individuals',
+      'Dual nutrition & habit tracking',
+      'Simultaneous form correction',
+      'Partner motivation & accountability',
+      'Dedicated WhatsApp group with Kush',
     ],
   },
   {
     _id: 'seed-3',
     id: 3,
     title: 'Session 24 - Single',
+    name: 'Session 24 - Single',
+    slug: 'session-24-single',
     duration: '2 Months',
     sessions: 24,
     planType: 'single',
@@ -75,17 +133,20 @@ const DEFAULT_PLANS = [
     currency: 'INR',
     description: '24 comprehensive 1-on-1 coaching sessions spanning 2 full months of transformation.',
     features: [
-      '24 Live 1-on-1 Video Sessions',
-      'Complete Periodized Transformation Plan',
-      'Macro & Meal Plan Optimization',
-      'Bi-weekly Body Composition Check-ins',
-      'Priority Schedule Slots & 24/7 WhatsApp',
+      '24 Live 1-on-1 video coaching sessions',
+      'Complete periodized transformation plan',
+      'Macro & meal plan optimization',
+      'Bi-weekly body composition check-ins',
+      'Priority schedule booking slots',
+      'VIP 24/7 WhatsApp support with Kush',
     ],
   },
   {
     _id: 'seed-4',
     id: 4,
     title: 'Session 24 - Couple',
+    name: 'Session 24 - Couple',
+    slug: 'session-24-couple',
     duration: '2 Months',
     sessions: 24,
     planType: 'couple',
@@ -93,11 +154,12 @@ const DEFAULT_PLANS = [
     currency: 'INR',
     description: '24 couple/partner video sessions over 2 months for double the accountability and results.',
     features: [
-      '24 Joint Video Coaching Sessions',
-      'Dual Transformation Periodization',
-      'Synchronized Nutrition Strategy',
-      'Shared Milestone Tracking & Form Audits',
-      'VIP WhatsApp Support with Kush',
+      '24 Live joint video coaching sessions',
+      'Dual transformation periodization',
+      'Synchronized dual nutrition strategy',
+      'Shared milestone tracking & form audits',
+      'Priority partner scheduling slots',
+      'Dedicated VIP WhatsApp group with Kush',
     ],
   },
 ];
@@ -343,7 +405,7 @@ export const HomePage = () => {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {filteredPlans.map((plan) => {
             const isCouple = plan.planType === 'couple';
 
@@ -359,7 +421,13 @@ export const HomePage = () => {
                 {/* Header Badge */}
                 <div className="flex justify-between items-start mb-4">
                   <Badge variant={isCouple ? 'emerald' : 'accent'}>
-                    {isCouple ? 'Couple / Partner' : '1-on-1 Single'}
+                    {isCouple
+                      ? 'Couple / Partner'
+                      : plan.slug === 'diet-plan'
+                      ? 'Diet & Nutrition'
+                      : plan.slug === 'custom-workout-plan'
+                      ? 'Custom Training'
+                      : '1-on-1 Single'}
                   </Badge>
                   <span className="text-xs font-semibold text-brand-muted flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
@@ -372,15 +440,19 @@ export const HomePage = () => {
                   <div>
                     <h3 className="text-xl font-black text-white">{plan.title}</h3>
                     <p className="text-xs font-bold text-brand-accent mt-0.5">
-                      {plan.sessions} Live Coaching Sessions
+                      {plan.slug === 'diet-plan'
+                        ? 'Customized Nutrition Plan'
+                        : plan.slug === 'custom-workout-plan'
+                        ? 'Tailored Workout Structure'
+                        : `${plan.sessions} Live Coaching Sessions`}
                     </p>
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-4xl font-black text-white">
                       {formatINR(plan.price)}
                     </span>
-                    <span className="text-xs text-brand-darkMuted ml-1.5">all inclusive</span>
+                    <span className="text-xs font-semibold text-brand-muted">/ {plan.duration}</span>
                   </div>
 
                   <p className="text-xs text-brand-muted leading-relaxed min-h-[36px]">
@@ -415,7 +487,7 @@ export const HomePage = () => {
                     className="w-full text-xs font-bold uppercase tracking-wider gap-2 shadow-xl"
                     onClick={() => handlePlanSelect(plan.id || plan._id)}
                   >
-                    {isAuthenticated ? 'Buy Now' : 'Sign Up to Buy'}
+                    Get Started
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2.5 flex items-center justify-center gap-1">

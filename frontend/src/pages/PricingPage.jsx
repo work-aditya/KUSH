@@ -111,7 +111,7 @@ export const PricingPage = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPlans.map((plan) => {
             const isCouple = plan.planType === 'couple';
 
@@ -127,7 +127,13 @@ export const PricingPage = () => {
                 {/* Plan Badge */}
                 <div className="flex justify-between items-start mb-4">
                   <Badge variant={isCouple ? 'emerald' : 'accent'}>
-                    {isCouple ? 'Couple / Partner' : '1-on-1 Single'}
+                    {isCouple
+                      ? 'Couple / Partner'
+                      : plan.slug === 'diet-plan'
+                      ? 'Diet & Nutrition'
+                      : plan.slug === 'custom-workout-plan'
+                      ? 'Custom Training'
+                      : '1-on-1 Single'}
                   </Badge>
                   <span className="text-xs font-semibold text-brand-muted flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
@@ -140,15 +146,19 @@ export const PricingPage = () => {
                   <div>
                     <h3 className="text-xl font-extrabold text-white">{plan.title}</h3>
                     <p className="text-xs font-medium text-brand-accent mt-0.5">
-                      {plan.sessions} Live Interactive Sessions
+                      {plan.slug === 'diet-plan'
+                        ? 'Customized Nutrition Plan'
+                        : plan.slug === 'custom-workout-plan'
+                        ? 'Tailored Workout Structure'
+                        : `${plan.sessions} Live Interactive Sessions`}
                     </p>
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex items-baseline gap-1.5">
                     <span className="text-3xl sm:text-4xl font-black text-white">
                       {formatINR(plan.price)}
                     </span>
-                    <span className="text-xs text-brand-darkMuted ml-2">all inclusive</span>
+                    <span className="text-xs font-semibold text-brand-muted">/ {plan.duration}</span>
                   </div>
 
                   <p className="text-xs text-brand-muted leading-relaxed min-h-[36px]">
@@ -183,7 +193,7 @@ export const PricingPage = () => {
                     className="w-full text-sm font-bold uppercase tracking-wider gap-2 shadow-xl"
                     onClick={() => handleCheckout(plan)}
                   >
-                    {isAuthenticated ? 'Enroll / Buy Now' : 'Sign Up to Enroll'}
+                    Get Started
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">
