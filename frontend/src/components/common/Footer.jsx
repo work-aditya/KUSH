@@ -114,7 +114,7 @@ export const Footer = () => {
               <span>•</span>
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-brand-emerald" />
-                Razorpay Secure Payments
+                Secured Payments
               </span>
             </div>
           </div>

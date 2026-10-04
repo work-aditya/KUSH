@@ -243,8 +243,8 @@ export const HomePage = () => {
                   <p className="text-[11px] text-brand-muted uppercase font-bold tracking-wider">& Couple Options</p>
                 </div>
                 <div>
-                  <p className="text-2xl sm:text-3xl font-black text-brand-emerald">Razorpay</p>
-                  <p className="text-[11px] text-brand-muted uppercase font-bold tracking-wider">Secure Checkouts</p>
+                  <p className="text-2xl sm:text-3xl font-black text-brand-emerald">100%</p>
+                  <p className="text-[11px] text-brand-muted uppercase font-bold tracking-wider">Secured Payments</p>
                 </div>
               </div>
             </motion.div>
@@ -492,7 +492,7 @@ export const HomePage = () => {
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2.5 flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
-                    Razorpay Verified • Instant Tax Invoice
+                    Secured Payments • Instant Tax Invoice
                   </p>
                 </div>
               </div>
@@ -572,7 +572,7 @@ export const HomePage = () => {
               Ready for Unmatched Accountability & Results?
             </h2>
             <p className="text-base text-brand-muted leading-relaxed">
-              Experience the power of live 1-on-1 and couple coaching with Coach Kush. Secure your membership today with Razorpay or reach out directly on WhatsApp.
+              Experience the power of live 1-on-1 and couple coaching with Coach Kush. Secure your membership today with Secured Payments or reach out directly on WhatsApp.
             </p>
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/pricing">

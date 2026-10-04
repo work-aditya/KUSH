@@ -80,20 +80,20 @@ supabase functions list
    - `VITE_WHATSAPP_CONTACT_URL`: `https://wa.me/917042858524`
 3. Deploy! Vercel will automatically run `npm run build` producing the production bundle in `dist`.
 
-### 7. Configure Custom Domain (cochkush.in)
+### 7. Configure Custom Domain (coachkush.in)
 1. In your **Vercel Dashboard** > **Project Settings** > **Domains**:
-   - Add `cochkush.in` (Recommended: Redirect `cochkush.in` to `www.cochkush.in` or vice versa)
-   - Add `www.cochkush.in`
+   - Add `coachkush.in` (Recommended: Redirect `coachkush.in` to `www.coachkush.in` or vice versa)
+   - Add `www.coachkush.in`
 2. Configure DNS Records with your domain registrar:
    - **Type A**: `@` -> `76.76.21.21` (Vercel IP)
    - **Type CNAME**: `www` -> `cname.vercel-dns.com`
 3. In **Supabase Dashboard** > **Authentication** > **URL Configuration**:
-   - Set **Site URL**: `https://cochkush.in`
+   - Set **Site URL**: `https://coachkush.in`
    - Add to **Redirect URLs**:
-     - `https://cochkush.in/**`
-     - `https://www.cochkush.in/**`
-     - `https://*.vercel.app/**`
+     - `https://coachkush.in/**`
+     - `https://www.coachkush.in/**`
      - `http://localhost:5173/**`
+     - `https://*.vercel.app/**`
 4. Social Media:
    - Official Instagram handle: `https://instagram.com/coachhkush` (@coachhkush)
 

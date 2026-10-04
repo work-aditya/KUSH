@@ -33,7 +33,7 @@ export const pageService = {
       if (slug === 'privacy') {
         return {
           title: 'Privacy Policy',
-          content: 'At CoachKush, your privacy is our priority. All transactions are securely encrypted via Razorpay.',
+          content: 'At CoachKush, your privacy is our priority. All transactions are protected via Secured Payments.',
         };
       }
       if (slug === 'terms') {

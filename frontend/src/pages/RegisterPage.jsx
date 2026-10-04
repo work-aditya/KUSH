@@ -5,13 +5,19 @@ import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
-import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { normalizePhoneNumber, isValidPhoneNumber } from '../utils/phone';
+import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const registerSchema = z
   .object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email address'),
-    phone: z.string().min(10, 'Phone must be at least 10 digits'),
+    phone: z
+      .string()
+      .min(10, 'Phone must be at least 10 digits')
+      .refine((val) => isValidPhoneNumber(val), {
+        message: 'Please enter a valid mobile number with country code (e.g. +91 9876543210 or 10-digit number)',
+      }),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')
@@ -30,6 +36,7 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registrationError, setRegistrationError] = useState(null);
 
   const {
     register,
@@ -40,17 +47,26 @@ export const RegisterPage = () => {
   });
 
   const onSubmit = async (data) => {
+    setRegistrationError(null);
     try {
-      const res = await registerUser(data);
+      const normalizedPhone = normalizePhoneNumber(data.phone);
+      const res = await registerUser({
+        ...data,
+        phone: normalizedPhone,
+      });
+
       if (res?.requiresEmailVerification) {
         navigate('/login', { state: { emailVerificationNotice: true, email: data.email } });
       } else {
         navigate('/pricing');
       }
     } catch (err) {
-      // Toast displayed via useAuth
+      setRegistrationError(err.message || 'Unable to create your account right now. Please try again.');
     }
   };
+
+  const isEmailDuplicate = registrationError === 'An account with this email already exists.';
+  const isPhoneDuplicate = registrationError === 'An account with this phone number already exists.';
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
@@ -67,6 +83,58 @@ export const RegisterPage = () => {
           </p>
         </div>
 
+        {/* User-friendly duplicate email alert */}
+        {isEmailDuplicate && (
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-3 animate-in fade-in duration-300">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+              <div>
+                <p className="font-bold text-white">An account with this email already exists.</p>
+                <p className="text-[11px] text-brand-muted mt-0.5">
+                  Would you like to log in or reset your password?
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 pt-2 border-t border-amber-500/20">
+              <Link to="/login" className="text-brand-accent hover:underline font-bold">
+                Log In
+              </Link>
+              <span className="text-brand-muted">•</span>
+              <Link to="/forgot-password" className="text-brand-accent hover:underline font-bold">
+                Forgot Password?
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* User-friendly duplicate phone alert */}
+        {isPhoneDuplicate && (
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-3 animate-in fade-in duration-300">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+              <div>
+                <p className="font-bold text-white">An account with this phone number already exists.</p>
+                <p className="text-[11px] text-brand-muted mt-0.5">
+                  Please log in to your existing account.
+                </p>
+              </div>
+            </div>
+            <div className="pt-1 border-t border-amber-500/20">
+              <Link to="/login" className="text-brand-accent hover:underline font-bold">
+                Log In
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Other friendly error */}
+        {registrationError && !isEmailDuplicate && !isPhoneDuplicate && (
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+            <p className="font-medium">{registrationError}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">
@@ -78,6 +146,7 @@ export const RegisterPage = () => {
                 type="text"
                 placeholder="ENTER FULL NAME"
                 {...register('name')}
+                onChange={() => setRegistrationError(null)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
             </div>
@@ -96,6 +165,7 @@ export const RegisterPage = () => {
                 type="email"
                 placeholder="ENTER EMAIL"
                 {...register('email')}
+                onChange={() => setRegistrationError(null)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
             </div>
@@ -112,8 +182,9 @@ export const RegisterPage = () => {
               <Phone className="w-4 h-4 text-brand-muted absolute left-3.5 top-3.5" />
               <input
                 type="tel"
-                placeholder="PHONE NUMBER"
+                placeholder="+91 98765 43210"
                 {...register('phone')}
+                onChange={() => setRegistrationError(null)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
               />
             </div>
@@ -133,6 +204,7 @@ export const RegisterPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="PASSWORD"
                   {...register('password')}
+                  onChange={() => setRegistrationError(null)}
                   className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
                 <button
@@ -159,6 +231,7 @@ export const RegisterPage = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="CONFIRM PASSWORD"
                   {...register('confirmPassword')}
+                  onChange={() => setRegistrationError(null)}
                   className="w-full pl-10 pr-10 py-3 rounded-xl bg-brand-card border border-brand-border text-white text-sm placeholder:text-brand-darkMuted focus:outline-none focus:border-brand-accent transition-colors"
                 />
                 <button
@@ -197,3 +270,5 @@ export const RegisterPage = () => {
     </div>
   );
 };
+
+export default RegisterPage;

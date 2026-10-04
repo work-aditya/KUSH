@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { ProtectedRoute } from './components/protected/ProtectedRoute';
 import { AdminRoute } from './components/protected/AdminRoute';
+import { triggerOrganicHeartbeat } from './services/heartbeatService';
 
 // Public Pages
 import { HomePage } from './pages/HomePage';
@@ -14,6 +15,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { FAQPage } from './pages/FAQPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentFailedPage } from './pages/PaymentFailedPage';
@@ -32,6 +34,11 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 
 export function App() {
+  useEffect(() => {
+    // Lightweight, throttled organic activity check to prevent Supabase inactivity pausing
+    triggerOrganicHeartbeat();
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -46,6 +53,7 @@ export function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="reset-password" element={<ResetPasswordPage />} />
+          <Route path="auth/callback" element={<AuthCallbackPage />} />
           <Route path="privacy" element={<DynamicPage defaultSlug="privacy" />} />
           <Route path="terms" element={<DynamicPage defaultSlug="terms" />} />
           <Route

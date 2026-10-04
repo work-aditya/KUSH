@@ -35,16 +35,16 @@ export const FAQ_DATA = [
   {
     id: 'faq-5',
     category: 'payments',
-    question: 'What payment methods are accepted through Razorpay?',
+    question: 'What payment methods are accepted for Secured Payments?',
     answer:
-      'All payments are processed with end-to-end encryption via Razorpay. We support UPI (Google Pay, PhonePe, Paytm, BHIM, Cred), all major Credit/Debit cards (Visa, Mastercard, RuPay), and NetBanking. You receive an official GST Tax Invoice PDF immediately upon checkout.',
+      'All transactions are processed with end-to-end encryption via Secured Payments. We support UPI (Google Pay, PhonePe, Paytm, BHIM, Cred), all major Credit/Debit cards (Visa, Mastercard, RuPay), and NetBanking. You receive an official GST Tax Invoice PDF immediately upon checkout.',
   },
   {
     id: 'faq-6',
     category: 'coupons',
     question: 'How do discount coupons work during checkout?',
     answer:
-      'When you click "Buy Now" on any coaching package, a secure checkout window will open with a coupon code field. Enter your valid promo code (e.g. KUSH10) and click Apply. The discount will be verified and deducted from your total before you proceed with Razorpay.',
+      'When you click "Buy Now" on any coaching package, a secure checkout window will open with a coupon code field. Enter your valid promo code (e.g. KUSH10) and click Apply. The discount will be verified and deducted from your total before you proceed with Secured Payments.',
   },
   {
     id: 'faq-7',
@@ -67,11 +67,11 @@ const CATEGORIES = [
   { id: 'training', label: 'Live Training', icon: Dumbbell },
   { id: 'equipment', label: 'Equipment & Diet', icon: Apple },
   { id: 'couple', label: 'Couple Coaching', icon: Users },
-  { id: 'payments', label: 'Razorpay & Billing', icon: CreditCard },
+  { id: 'payments', label: 'Secured Payments & Billing', icon: CreditCard },
   { id: 'coupons', label: 'Coupons & Promos', icon: Sparkles },
 ];
 
-export const FAQSection = ({ className = '', title = 'Frequently Asked Questions', subtitle = 'Everything you need to know about live virtual coaching, pricing, Razorpay checkout, and training policies.' }) => {
+export const FAQSection = ({ className = '', title = 'Frequently Asked Questions', subtitle = 'Everything you need to know about live virtual coaching, pricing, secured checkout, and training policies.' }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [openId, setOpenId] = useState(FAQ_DATA[0].id);
 

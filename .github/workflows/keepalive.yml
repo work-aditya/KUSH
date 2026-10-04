@@ -1,0 +1,29 @@
+name: Supabase Activity Keep-Alive
+
+on:
+  schedule:
+    # Runs daily at 04:00 UTC (approximately once per day)
+    - cron: '0 4 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  keepalive:
+    name: Supabase Inactivity Prevention Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Keep-Alive Procedure
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "Supabase credentials not configured in GitHub Secrets. Vercel Cron will handle keep-alive."
+            exit 0
+          fi
+          echo "Pinging record_fallback_heartbeat..."
+          RESPONSE=$(curl -s -X POST "${SUPABASE_URL}/rest/v1/rpc/record_fallback_heartbeat" \
+            -H "Content-Type: application/json" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}" \
+            -d '{"stale_threshold_hours": 20}')
+          echo "Response: $RESPONSE"

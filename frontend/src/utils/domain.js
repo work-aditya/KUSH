@@ -5,19 +5,18 @@
  * and dynamic authentication redirects across all configured domain variants.
  */
 
-export const PRIMARY_DOMAIN = 'cochkush.in';
-export const PRIMARY_URL = 'https://cochkush.in';
+export const PRIMARY_DOMAIN = 'coachkush.in';
+export const PRIMARY_URL = 'https://coachkush.in';
 
 export const SUPPORTED_DOMAINS = [
-  'cochkush.in',
-  'www.cochkush.in',
   'coachkush.in',
   'www.coachkush.in',
-  'cochkush.com',
-  'www.cochkush.com',
   'coachkush.com',
   'www.coachkush.com',
-  'kush-frontend.vercel.app',
+  'cochkush.in',
+  'www.cochkush.in',
+  'cochkush.com',
+  'www.cochkush.com',
 ];
 
 /**

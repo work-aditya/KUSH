@@ -20,22 +20,17 @@ api_role = "anon"
 
 [auth]
 enabled = true
-site_url = "https://cochkush.in"
+site_url = "https://coachkush.in"
 additional_redirect_urls = [
   "http://localhost:5173/**",
   "http://localhost:3000/**",
   "http://127.0.0.1:5173/**",
-  "https://cochkush.in/**",
-  "https://www.cochkush.in/**",
-  "http://cochkush.in/**",
-  "http://www.cochkush.in/**",
   "https://coachkush.in/**",
   "https://www.coachkush.in/**",
   "https://coachkush.com/**",
   "https://www.coachkush.com/**",
-  "https://cochkush.com/**",
-  "https://www.cochkush.com/**",
-  "https://kush-frontend.vercel.app/**",
+  "https://cochkush.in/**",
+  "https://www.cochkush.in/**",
   "https://*.vercel.app/**"
 ]
 jwt_expiry = 3600

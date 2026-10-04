@@ -115,7 +115,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
         dispatch(
           addToast({
             type: 'success',
-            message: 'Payment confirmed successfully via Razorpay (Test Environment)',
+            message: 'Payment confirmed successfully (Test Environment)',
           })
         );
         onClose();
@@ -141,7 +141,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
               razorpay_signature: response.razorpay_signature,
             });
 
-            dispatch(addToast({ type: 'success', message: 'Payment confirmed by Razorpay!' }));
+            dispatch(addToast({ type: 'success', message: 'Payment confirmed successfully!' }));
             onClose();
             navigate(`/payment/success?orderRef=${orderRef}`);
           } catch (verifyErr) {
@@ -216,7 +216,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
             <Badge variant="accent">Secure Checkout</Badge>
             <span className="text-[11px] font-semibold text-brand-emerald flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Razorpay Secured
+              Secured Payments
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -343,7 +343,7 @@ export const CheckoutModal = ({ isOpen, onClose, plan, user }) => {
             onClick={handleProceedPayment}
           >
             <Lock className="w-4 h-4" />
-            Pay {formatINR(finalPrice)} via Razorpay
+            Pay {formatINR(finalPrice)} via Secured Payments
             {!paymentProcessing && <ArrowRight className="w-4 h-4" />}
           </Button>
 

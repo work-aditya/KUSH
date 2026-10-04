@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
-import { Lock, Mail, ArrowRight, Eye, EyeOff, Info } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Eye, EyeOff, Info, CheckCircle2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required'),
@@ -60,6 +60,18 @@ export const LoginPage = () => {
             Sign in to access your coaching session details and orders.
           </p>
         </div>
+
+        {location.state?.passwordUpdatedNotice && (
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3 text-xs text-emerald-400 animate-in fade-in duration-300">
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+            <div>
+              <p className="font-semibold text-white">Password Updated Successfully!</p>
+              <p className="text-brand-muted mt-0.5">
+                {location.state?.message || 'Your password has been updated. Please sign in with your new password.'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {emailVerificationNotice && (
           <div className="p-4 rounded-2xl bg-brand-accent/10 border border-brand-accent/30 flex items-start gap-3 text-xs text-brand-accent">

@@ -19,7 +19,7 @@ export const FAQPage = () => {
 
       <FAQSection
         title="Knowledge Base & Frequently Asked Questions"
-        subtitle="Find answers to all your questions about live virtual training, couple coaching packages, Razorpay payment security, and our refund & rescheduling guidelines."
+        subtitle="Find answers to all your questions about live virtual training, couple coaching packages, payment security, and our refund & rescheduling guidelines."
       />
     </div>
   );

@@ -11,25 +11,54 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
 
+  // Check if current flow is recovery session
+  const isRecoveryActive = typeof window !== 'undefined' && (
+    window.location.pathname.includes('/reset-password') ||
+    window.location.pathname.includes('/auth/callback') ||
+    sessionStorage.getItem('ck_recovery_active') === 'true'
+  );
+
   // Initial user fetch
   const { data: initialUser, isFetched, isError } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: authService.getMe,
     retry: false,
     staleTime: 5 * 60 * 1000,
+    enabled: !isRecoveryActive,
   });
 
   useEffect(() => {
+    if (isRecoveryActive) {
+      // Never set full authenticated session during password recovery flow
+      return;
+    }
+
     if (initialUser) {
       dispatch(setUser(initialUser));
     } else if (isFetched || isError) {
       dispatch(clearUser());
     }
-  }, [initialUser, isFetched, isError, dispatch]);
+  }, [initialUser, isFetched, isError, dispatch, isRecoveryActive]);
 
   // Supabase Auth State Change Listener
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // 1. Password Recovery Flow - Never treat as normal dashboard login session
+      if (event === 'PASSWORD_RECOVERY') {
+        sessionStorage.setItem('ck_recovery_active', 'true');
+        return;
+      }
+
+      const isRecovery = typeof window !== 'undefined' && (
+        window.location.pathname.includes('/reset-password') ||
+        sessionStorage.getItem('ck_recovery_active') === 'true'
+      );
+
+      if (isRecovery && event !== 'SIGNED_OUT') {
+        return;
+      }
+
+      // 2. Normal authenticated session
       if (session?.user) {
         const userObj = await authService.getMe();
         if (userObj) {
@@ -39,7 +68,7 @@ export const useAuth = () => {
         }
 
         if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
-          dispatch(addToast({ type: 'success', message: 'Email verified successfully! Welcome to Coach Kush.' }));
+          dispatch(addToast({ type: 'success', message: 'Email verified successfully! Welcome to CoachKush.' }));
           window.history.replaceState(null, '', window.location.pathname);
         }
       } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
@@ -74,13 +103,7 @@ export const useAuth = () => {
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     },
     onError: (err) => {
-      let msg = err.message || 'Registration failed';
-      if (msg === 'Failed to fetch') {
-        msg = 'Unable to connect to authentication server. Please check your network connection.';
-      } else if (msg.includes('rate limit')) {
-        msg = 'Email rate limit reached on auth server. Please wait a few minutes or try again later.';
-      }
-      dispatch(addToast({ type: 'error', message: msg }));
+      dispatch(addToast({ type: 'error', message: err.message || 'Registration failed' }));
     },
   });
 
@@ -121,7 +144,7 @@ export const useAuth = () => {
   const resetPasswordMutation = useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: () => {
-      dispatch(addToast({ type: 'success', message: 'Password updated successfully! You can now sign in.' }));
+      dispatch(addToast({ type: 'success', message: 'Your password has been updated successfully.' }));
     },
     onError: (err) => {
       const msg = err.message === 'Failed to fetch'

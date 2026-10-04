@@ -198,7 +198,7 @@ export const PricingPage = () => {
                   </Button>
                   <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3 h-3 text-brand-emerald" />
-                    Secured by Razorpay • Instant Tax Invoice
+                    Secured Payments • Instant Tax Invoice
                   </p>
                 </div>
               </div>

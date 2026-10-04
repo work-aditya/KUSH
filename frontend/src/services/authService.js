@@ -1,7 +1,72 @@
-import { supabase } from '../lib/supabaseClient';
-import { getAuthRedirectUrl } from '../utils/domain';
+import { supabase } from '../lib/supabaseClient.js';
+import { getAuthRedirectUrl } from '../utils/domain.js';
+import { normalizePhoneNumber } from '../utils/phone.js';
 
 const ADMIN_ROLE_ID = '22b2bf47-cdc5-413b-a67c-ebe9ab657981';
+
+/**
+ * Maps Supabase & PostgreSQL errors to user-friendly messages without leaking
+ * database details, error codes (e.g. 23505), or internal stack traces.
+ */
+export const mapAuthError = (error) => {
+  if (!error) return new Error('An unexpected error occurred. Please try again.');
+  const msg = (error.message || '').toLowerCase();
+  const code = (error.code || error.status || '').toString().toLowerCase();
+
+  // 1. Phone number already exists
+  if (
+    msg.includes('phone_already_exists') ||
+    msg.includes('profiles_phone_key') ||
+    msg.includes('idx_profiles_normalized_phone') ||
+    msg.includes('account with this phone number already exists') ||
+    msg.includes('phone number already exists') ||
+    (msg.includes('phone') && (msg.includes('unique') || msg.includes('duplicate') || msg.includes('23505')))
+  ) {
+    return new Error('An account with this phone number already exists.');
+  }
+
+  // 2. Email address already exists
+  if (
+    msg.includes('user already registered') ||
+    msg.includes('email already in use') ||
+    msg.includes('email address already registered') ||
+    msg.includes('account with this email already exists') ||
+    (msg.includes('email') && (msg.includes('unique') || msg.includes('duplicate') || msg.includes('already exists')))
+  ) {
+    return new Error('An account with this email already exists.');
+  }
+
+  // 3. Network / Connection errors
+  if (msg.includes('failed to fetch') || msg.includes('network') || msg.includes('timeout')) {
+    return new Error('Unable to connect to authentication server. Please check your network connection.');
+  }
+
+  // 4. Rate limits
+  if (msg.includes('rate limit') || msg.includes('too many requests')) {
+    return new Error('Email rate limit reached on auth server. Please wait a few minutes before trying again.');
+  }
+
+  // 5. Database errors / constraint violations
+  if (
+    msg.includes('database error') ||
+    msg.includes('duplicate key') ||
+    msg.includes('postgresql') ||
+    msg.includes('constraint') ||
+    msg.includes('23505') ||
+    msg.includes('relation') ||
+    code === '23505'
+  ) {
+    if (msg.includes('phone')) {
+      return new Error('An account with this phone number already exists.');
+    }
+    if (msg.includes('email')) {
+      return new Error('An account with this email already exists.');
+    }
+    return new Error('Unable to create your account right now. Please try again.');
+  }
+
+  return new Error(error.message || 'Unable to create your account right now. Please try again.');
+};
 
 const formatUserData = async (authUser) => {
   if (!authUser) return null;
@@ -16,10 +81,10 @@ const formatUserData = async (authUser) => {
         roleName = 'admin';
       }
     } catch {
-      // ignore RPC error and continue to table query
+      // continue to table query
     }
 
-    // 2. Query all roles from user_roles (Array lookup, not maybeSingle to support multi-role accounts)
+    // 2. Query all roles from user_roles
     if (roleName !== 'admin') {
       const { data: userRoles } = await supabase
         .from('user_roles')
@@ -62,7 +127,7 @@ const formatUserData = async (authUser) => {
       .eq('id', authUser.id)
       .maybeSingle();
     profile = data;
-  } catch (err) {
+  } catch {
     // ignore
   }
 
@@ -84,41 +149,94 @@ const formatUserData = async (authUser) => {
 };
 
 export const authService = {
-  // 1. Customer Sign Up with Supabase Auth
+  // 1. Customer Sign Up with Supabase Auth & Normalized Phone Protection
   async register({ email, password, name, phone }) {
-    const redirectUrl = getAuthRedirectUrl('/');
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: name,
-          name,
-          phone,
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+    const normalizedPhone = normalizePhoneNumber(phone);
+
+    // Step A: Pre-check phone availability at database level
+    if (normalizedPhone) {
+      try {
+        const { data: isAvail, error: checkErr } = await supabase.rpc('check_phone_availability', {
+          check_phone: normalizedPhone,
+        });
+
+        if (!checkErr && isAvail === false) {
+          throw new Error('An account with this phone number already exists.');
+        }
+      } catch (err) {
+        if (err.message === 'An account with this phone number already exists.') {
+          throw err;
+        }
+        // Fallback: direct check on profiles table
+        try {
+          const { data: existingProf } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('phone', normalizedPhone)
+            .maybeSingle();
+
+          if (existingProf) {
+            throw new Error('An account with this phone number already exists.');
+          }
+        } catch (subErr) {
+          if (subErr.message === 'An account with this phone number already exists.') {
+            throw subErr;
+          }
+        }
+      }
+    }
+
+    // Step B: Set authoritative redirect URL to active origin /auth/callback
+    const redirectUrl = typeof window !== 'undefined' && window.location?.origin
+      ? `${window.location.origin}/auth/callback`
+      : getAuthRedirectUrl('/auth/callback');
+
+    let signUpRes;
+    try {
+      signUpRes = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: cleanName,
+            name: cleanName,
+            phone: normalizedPhone,
+          },
         },
-      },
-    });
+      });
+    } catch (netErr) {
+      throw mapAuthError(netErr);
+    }
+
+    const { data, error } = signUpRes;
 
     if (error) {
-      throw new Error(error.message || 'Registration failed');
+      throw mapAuthError(error);
+    }
+
+    // Supabase Auth duplicate email check when confirmations are enabled
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      throw new Error('An account with this email already exists.');
     }
 
     if (!data.user) {
-      throw new Error('Registration succeeded, but no user was returned. Please verify your email.');
+      throw new Error('Registration completed, but no user data was returned. Please verify your email.');
     }
 
-    // Safely upsert profile if session exists
+    // Safely upsert profile if session exists immediately (e.g. email confirmations disabled)
     if (data.session) {
       try {
         await supabase.from('profiles').upsert({
           id: data.user.id,
-          full_name: name,
-          phone,
+          full_name: cleanName,
+          phone: normalizedPhone,
           is_active: true,
         });
       } catch (profileErr) {
-        console.warn('Profile upsert warning:', profileErr);
+        console.warn('Profile upsert note:', profileErr?.message);
       }
     }
 
@@ -132,13 +250,21 @@ export const authService = {
 
   // 2. Customer Sign In with Supabase Auth
   async login({ email, password }) {
+    const cleanEmail = email.trim().toLowerCase();
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: cleanEmail,
       password,
     });
 
     if (error) {
-      throw new Error(error.message || 'Invalid credentials');
+      const msg = error.message?.toLowerCase() || '';
+      if (msg.includes('invalid login credentials') || msg.includes('invalid credentials')) {
+        throw new Error('Invalid email or password. Please try again.');
+      }
+      if (msg.includes('email not confirmed')) {
+        throw new Error('Please confirm your email address before logging in.');
+      }
+      throw new Error(error.message || 'Login failed');
     }
 
     const formattedUser = await formatUserData(data.user);
@@ -147,8 +273,9 @@ export const authService = {
 
   // 3. Admin Authentication & Role Verification
   async adminLogin({ email, password }) {
+    const cleanEmail = email.trim().toLowerCase();
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: cleanEmail,
       password,
     });
 
@@ -183,27 +310,68 @@ export const authService = {
     return await formatUserData(session.user);
   },
 
-  // 6. Request Password Reset Link
+  // 6. Request Password Reset Link with Recovery Redirect
   async forgotPassword(email) {
-    const redirectUrl = getAuthRedirectUrl('/reset-password');
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    const cleanEmail = email.trim().toLowerCase();
+    const redirectUrl = typeof window !== 'undefined' && window.location?.origin
+      ? `${window.location.origin}/auth/callback?type=recovery`
+      : getAuthRedirectUrl('/auth/callback?type=recovery');
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
       redirectTo: redirectUrl,
     });
+
     if (error) {
+      const msg = error.message?.toLowerCase() || '';
+      if (msg.includes('rate limit')) {
+        throw new Error('Reset request limit reached. Please wait a few minutes before trying again.');
+      }
       throw new Error(error.message || 'Failed to send password reset email');
     }
+
     return data;
   },
 
-  // 7. Update / Reset Password
+  // 7. Update / Reset Password in Recovery Session
   async resetPassword(newPassword) {
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
     });
+
     if (error) {
-      throw new Error(error.message || 'Failed to update password');
+      const msg = error.message?.toLowerCase() || '';
+      if (msg.includes('same_password') || msg.includes('same password')) {
+        throw new Error('Your new password must be different from your old password.');
+      }
+      if (msg.includes('expired') || msg.includes('invalid') || msg.includes('session')) {
+        throw new Error('Password reset link has expired or is invalid. Please request a new link.');
+      }
+      throw new Error(error.message || 'Failed to update password. Please try again.');
     }
+
     return data;
+  },
+
+  // 8. Explicit Phone Availability Checker
+  async checkPhoneAvailability(phone) {
+    const norm = normalizePhoneNumber(phone);
+    if (!norm) return true;
+
+    try {
+      const { data, error } = await supabase.rpc('check_phone_availability', {
+        check_phone: norm,
+      });
+      if (error) throw error;
+      return data === true;
+    } catch {
+      // Fallback query
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('phone', norm)
+        .maybeSingle();
+      return !data;
+    }
   },
 };
 

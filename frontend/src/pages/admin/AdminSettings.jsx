@@ -465,7 +465,7 @@ export const AdminSettings = () => {
               {/* Bottom Copyright */}
               <div className="pt-4 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-brand-darkMuted gap-2">
                 <p>&copy; {new Date().getFullYear()} {formData.footer_copyright}</p>
-                <p>Live Video Coaching • Razorpay Secure</p>
+                <p>Live Video Coaching • Secured Payments</p>
               </div>
             </div>
           </div>
