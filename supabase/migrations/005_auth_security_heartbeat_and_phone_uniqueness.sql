@@ -42,9 +42,23 @@ $$ language plpgsql immutable set search_path = public;
 
 -- 2. UNIQUE INDEX ON NORMALIZED PHONE
 -- Ensures no two accounts can share the same normalized phone number regardless of formatting differences
-create unique index if not exists idx_profiles_normalized_phone
-  on public.profiles (public.normalize_phone(phone))
-  where phone is not null and phone != '';
+-- If existing duplicate phone numbers are found in the database, safely notice without deleting data
+do $$
+begin
+  if not exists (
+    select 1
+    from public.profiles
+    where phone is not null and phone != ''
+    group by public.normalize_phone(phone)
+    having count(*) > 1
+  ) then
+    create unique index if not exists idx_profiles_normalized_phone
+      on public.profiles (public.normalize_phone(phone))
+      where phone is not null and phone != '';
+  else
+    raise notice 'DUPLICATE_PHONES_EXIST: Unique index idx_profiles_normalized_phone deferred until existing duplicates are resolved.';
+  end if;
+end $$;
 
 -- 3. PHONE AVAILABILITY RPC (Safe for public/anon check before registration)
 create or replace function public.check_phone_availability(check_phone text)
