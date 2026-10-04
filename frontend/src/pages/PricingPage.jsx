@@ -9,6 +9,7 @@ import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { formatINR } from '../utils/formatters';
 import { CheckoutModal } from '../components/checkout/CheckoutModal';
 import { FAQSection } from '../components/common/FAQSection';
+import { SEO } from '../components/common/SEO';
 import {
   CheckCircle,
   Video,
@@ -48,11 +49,16 @@ export const PricingPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-16">
+      <SEO
+        title="Plans & Pricing | Online Fitness Coaching Packages | Coach Kush | coachkush.in"
+        description="Explore online fitness coaching plans and pricing by Coach Kush on coachkush.in. Transparent rates for live 1-on-1 virtual training, couple workouts, and custom diet plans."
+        canonical="/pricing"
+      />
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <Badge variant="accent">Official Coaching Memberships</Badge>
         <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
-          Invest in Real Transformation
+          Online Fitness Coaching Plans & Pricing
         </h1>
         <p className="text-base sm:text-lg text-brand-muted leading-relaxed">
           Select the program that fits your goals. Every membership includes 100% live Google Meet / Zoom coaching, custom programming, and direct access to Kush.

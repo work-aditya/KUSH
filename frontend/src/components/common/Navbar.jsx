@@ -30,7 +30,7 @@ export const Navbar = () => {
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-brand-card border border-brand-border flex items-center justify-center p-1.5 group-hover:border-brand-accent/50 transition-colors">
-            <img src="/assets/logo/logo.svg" alt="CoachKush Logo" className="w-full h-full" />
+            <img src="/assets/logo/logo.svg" alt="CoachKush Logo" width="40" height="40" className="w-full h-full" />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-brand-accent transition-colors">

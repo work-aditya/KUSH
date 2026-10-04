@@ -27,7 +27,7 @@ export const Footer = () => {
   const whatsappNumber = settings?.whatsapp_number || '+91 70428 58524';
   const instagramUrl = settings?.instagram_url || 'https://instagram.com/coachhkush';
   const youtubeUrl = settings?.youtube_url;
-  const supportEmail = settings?.email || 'support@coachkush.com';
+  const supportEmail = settings?.email || 'support@coachkush.in';
   const tagline =
     settings?.footer_tagline ||
     'Elite 1-on-1 and partner fitness coaching led directly by Kush. Delivering tailored body transformations, strength conditioning, and progressive overload tracking through live, interactive video coaching on Google Meet and Zoom.';
@@ -48,7 +48,7 @@ export const Footer = () => {
           <div className="md:col-span-2 space-y-5">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-brand-surface border border-brand-border flex items-center justify-center p-1.5 shadow-sm">
-                <img src="/assets/logo/logo.svg" alt="CoachKush" className="w-full h-full" />
+                <img src="/assets/logo/logo.svg" alt="CoachKush Logo" width="36" height="36" className="w-full h-full" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white">
                 COACH<span className="text-brand-accent">KUSH</span>
@@ -199,12 +199,12 @@ export const Footer = () => {
 
               {/* Legal Pages */}
               <li className="pt-2 border-t border-brand-border/40">
-                <Link to="/pages/terms" className="text-xs text-brand-darkMuted hover:text-brand-muted">
+                <Link to="/terms" className="text-xs text-brand-darkMuted hover:text-brand-muted">
                   Terms of Coaching
                 </Link>
               </li>
               <li>
-                <Link to="/pages/privacy" className="text-xs text-brand-darkMuted hover:text-brand-muted">
+                <Link to="/privacy" className="text-xs text-brand-darkMuted hover:text-brand-muted">
                   Privacy Policy
                 </Link>
               </li>

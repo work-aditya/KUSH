@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FAQSection } from '../components/common/FAQSection';
+import { SEO } from '../components/common/SEO';
 
 const DEFAULT_PLANS = [
   {
@@ -190,6 +191,11 @@ export const HomePage = () => {
 
   return (
     <div className="space-y-24 sm:space-y-36 pb-24 overflow-hidden">
+      <SEO
+        title="Coach Kush | Online Fitness Coach & Virtual Coaching | coachkush.in"
+        description="Coach Kush provides personalized online fitness coaching, live 1-on-1 virtual training, and couple coaching over Google Meet and Zoom. Transform your fitness with coachkush.in."
+        canonical="/"
+      />
       {/* 1. HERO SECTION WITH COACH KUSH VISUAL */}
       <section className="relative pt-8 sm:pt-14 lg:pt-18">
         {/* Background Atmosphere Glows */}
@@ -213,7 +219,7 @@ export const HomePage = () => {
               </div>
 
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08]">
-                Real-Time Fitness Coaching.{' '}
+                Online Fitness Coaching.{' '}
                 <span className="text-gradient-gold">Zero Compromise.</span>
               </h1>
 
@@ -263,7 +269,9 @@ export const HomePage = () => {
                 <div className="relative rounded-2xl overflow-hidden glass-card border border-brand-border/80 shadow-2xl">
                   <img
                     src="/assets/images/coach_kush.jpg"
-                    alt="Coach Kush in Training Facility"
+                    alt="Coach Kush - Online Fitness Coach and Virtual Trainer"
+                    width="600"
+                    height="450"
                     className="w-full h-[450px] object-cover object-top filter brightness-[0.95] contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
                   />
 
@@ -311,6 +319,12 @@ export const HomePage = () => {
               <p className="text-base text-brand-muted leading-relaxed">
                 In every session with me, we connect live on camera. I monitor your posture, spine alignment, eccentric tempo, breathing rhythm, and joint angles—ensuring every repetition builds muscle safely and effectively.
               </p>
+              <div className="pt-1">
+                <Link to="/about" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-accent hover:underline">
+                  <span>Learn more about Coach Kush's methodology</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-surface border border-brand-border">
                   <Flame className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
@@ -333,7 +347,9 @@ export const HomePage = () => {
               <div className="relative w-full rounded-2xl overflow-hidden glass-card border border-brand-border p-3 shadow-2xl">
                 <img
                   src="/assets/images/virtual_session.jpg"
-                  alt="Live Google Meet Zoom Coaching Demonstration"
+                  alt="Live 1-on-1 virtual fitness coaching session with Coach Kush"
+                  width="500"
+                  height="320"
                   className="w-full h-72 sm:h-80 object-cover rounded-xl"
                 />
                 <div className="p-4 space-y-2">
@@ -518,7 +534,9 @@ export const HomePage = () => {
               <div className="rounded-2xl overflow-hidden shadow-2xl border border-brand-border">
                 <img
                   src="/assets/images/couple_workout.jpg"
-                  alt="Couple Fitness Coaching"
+                  alt="Couple and partner virtual fitness coaching with Coach Kush"
+                  width="500"
+                  height="320"
                   className="w-full h-80 object-cover object-top filter contrast-[1.05]"
                 />
               </div>

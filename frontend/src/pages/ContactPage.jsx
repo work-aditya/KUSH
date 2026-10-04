@@ -9,6 +9,7 @@ import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { useDispatch } from 'react-redux';
 import { addToast } from '../store/slices/uiSlice';
 import { Mail, MessageCircle, Send, CheckCircle2, Clock, MapPin } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 const contactFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -51,6 +52,11 @@ export const ContactPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-16">
+      <SEO
+        title="Contact Coach Kush | Virtual Fitness Coaching & WhatsApp | coachkush.in"
+        description="Get in touch with Coach Kush for personalized online fitness coaching, virtual training inquiries, or WhatsApp consultation on +91 70428 58524 via coachkush.in."
+        canonical="/contact"
+      />
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <Badge variant="accent">Get In Touch</Badge>
         <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
@@ -96,7 +102,7 @@ export const ContactPage = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-white">Official Email</h4>
-                  <p className="text-xs text-brand-muted">support@coachkush.com</p>
+                  <p className="text-xs text-brand-muted">support@coachkush.in</p>
                 </div>
               </div>
 
@@ -116,7 +122,7 @@ export const ContactPage = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-white">Location & Delivery</h4>
-                  <p className="text-xs text-brand-muted">Virtual Live Training across India & Worldwide</p>
+                  <p className="text-xs text-brand-muted">Based in Delhi NCR — Virtual live fitness coaching delivered across Delhi, India & worldwide</p>
                 </div>
               </div>
             </div>

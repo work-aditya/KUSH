@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
 import { Lock, Mail, ArrowRight, Eye, EyeOff, Info, CheckCircle2 } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required'),
@@ -48,6 +49,7 @@ export const LoginPage = () => {
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+      <SEO title="Login | Coach Kush" noindex={true} />
       <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-brand-border shadow-2xl space-y-8">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center text-brand-accent mx-auto mb-4">

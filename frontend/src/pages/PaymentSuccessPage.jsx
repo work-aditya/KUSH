@@ -16,6 +16,7 @@ import {
   Calendar,
   Clock,
 } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
@@ -35,6 +36,7 @@ export const PaymentSuccessPage = () => {
   if (!orderRef) {
     return (
       <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
+        <SEO title="Payment Status | Coach Kush" noindex={true} />
         <AlertCircle className="w-12 h-12 text-brand-accent mx-auto" />
         <h1 className="text-2xl font-bold text-white">Missing Order Reference</h1>
         <p className="text-sm text-brand-muted">
@@ -50,6 +52,7 @@ export const PaymentSuccessPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
+        <SEO title="Verifying Payment | Coach Kush" noindex={true} />
         <Loader2 className="w-10 h-10 text-brand-accent animate-spin" />
         <h2 className="text-xl font-bold text-white">Verifying Payment...</h2>
         <p className="text-xs text-brand-muted max-w-sm">
@@ -62,6 +65,7 @@ export const PaymentSuccessPage = () => {
   if (isError || data?.status === 'failed') {
     return (
       <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
+        <SEO title="Payment Verification Failed | Coach Kush" noindex={true} />
         <div className="w-16 h-16 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
           <AlertCircle className="w-8 h-8" />
         </div>
@@ -85,6 +89,7 @@ export const PaymentSuccessPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <SEO title="Payment Successful | Coach Kush" noindex={true} />
       <div className="glass-card rounded-3xl p-8 sm:p-12 border border-brand-emerald/40 shadow-2xl space-y-8 relative overflow-hidden">
         {/* Glow Accent */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-emerald/10 rounded-full blur-3xl pointer-events-none" />

@@ -17,6 +17,7 @@ import {
   Shield,
   Ticket,
 } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const AdminLayout = () => {
   const { user, logout } = useAuth();
@@ -41,6 +42,7 @@ export const AdminLayout = () => {
 
   return (
     <div className="min-h-screen flex bg-[#080B11] text-brand-text">
+      <SEO title="Admin Portal | Coach Kush" noindex={true} />
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div

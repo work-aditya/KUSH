@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/common/Button';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const NotFoundPage = () => {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4 py-16 text-center">
+      <SEO title="Page Not Found | Coach Kush" noindex={true} />
       <div className="max-w-md w-full space-y-6">
         <div className="w-16 h-16 rounded-2xl bg-brand-card border border-brand-border flex items-center justify-center text-brand-accent mx-auto">
           <Dumbbell className="w-8 h-8" />

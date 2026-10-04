@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/common/Button';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { XCircle, RefreshCw, Mail, ArrowLeft } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const PaymentFailedPage = () => {
   const [searchParams] = useSearchParams();
@@ -10,6 +11,7 @@ export const PaymentFailedPage = () => {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-16 sm:py-24 text-center">
+      <SEO title="Payment Unsuccessful | Coach Kush" noindex={true} />
       <div className="glass-card rounded-3xl p-8 sm:p-12 border border-red-500/30 shadow-2xl space-y-6">
         <div className="w-16 h-16 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
           <XCircle className="w-8 h-8" />

@@ -3,10 +3,16 @@ import { FAQSection } from '../components/common/FAQSection';
 import { Badge } from '../components/common/Badge';
 import { HelpCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SEO } from '../components/common/SEO';
 
 export const FAQPage = () => {
   return (
     <div className="py-12 sm:py-20 space-y-12">
+      <SEO
+        title="FAQ | Virtual Fitness Coaching Questions | Coach Kush | coachkush.in"
+        description="Find answers to common questions about virtual fitness coaching, equipment needs, diet plans, scheduling, and payments with Coach Kush on coachkush.in."
+        canonical="/faq"
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           to="/"
@@ -18,6 +24,7 @@ export const FAQPage = () => {
       </div>
 
       <FAQSection
+        asH1={true}
         title="Knowledge Base & Frequently Asked Questions"
         subtitle="Find answers to all your questions about live virtual training, couple coaching packages, payment security, and our refund & rescheduling guidelines."
       />

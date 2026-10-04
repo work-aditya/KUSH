@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from '../components/common/Button';
 import { Lock, ArrowRight, ShieldCheck, Eye, EyeOff, ShieldAlert, CheckCircle2, Loader2 } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 const resetPasswordSchema = z
   .object({
@@ -145,6 +146,7 @@ export const ResetPasswordPage = () => {
   if (isCheckingSession) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-12 text-center space-y-4">
+        <SEO title="Reset Password | Coach Kush" noindex={true} />
         <Loader2 className="w-8 h-8 text-brand-accent animate-spin" />
         <p className="text-xs text-brand-muted">Verifying recovery credentials...</p>
       </div>
@@ -155,6 +157,7 @@ export const ResetPasswordPage = () => {
   if (isSuccess) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+        <SEO title="Password Updated | Coach Kush" noindex={true} />
         <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-emerald-500/30 shadow-2xl text-center space-y-6 animate-in fade-in duration-300">
           <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
             <CheckCircle2 className="w-8 h-8" />
@@ -179,6 +182,7 @@ export const ResetPasswordPage = () => {
   if (!hasValidRecoverySession) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+        <SEO title="Reset Link Expired | Coach Kush" noindex={true} />
         <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-brand-border shadow-2xl text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
             <ShieldAlert className="w-8 h-8" />
@@ -215,6 +219,7 @@ export const ResetPasswordPage = () => {
   // 4. Valid recovery session: Show Create New Password form
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+      <SEO title="Create New Password | Coach Kush" noindex={true} />
       <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-brand-border shadow-2xl space-y-8">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center text-brand-accent mx-auto mb-4">

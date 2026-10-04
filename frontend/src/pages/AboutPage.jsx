@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
+import { SEO } from '../components/common/SEO';
 import {
   ShieldCheck,
   Target,
@@ -17,6 +18,11 @@ import {
 export const AboutPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-24">
+      <SEO
+        title="About Coach Kush | Virtual Personal Trainer & Fitness Coach | coachkush.in"
+        description="Learn about Coach Kush, certified online fitness coach and virtual trainer based in Delhi NCR, delivering live 1-on-1 and couple coaching across India & worldwide on coachkush.in."
+        canonical="/about"
+      />
       {/* 1. Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <Badge variant="accent">The Coach Behind Your Results</Badge>
@@ -24,7 +30,7 @@ export const AboutPage = () => {
           About Coach Kush
         </h1>
         <p className="text-lg text-brand-muted leading-relaxed">
-          Pioneering high-accountability virtual coaching where every session is live, interactive, and tailored to your biomechanics.
+          Pioneering high-accountability virtual coaching where every session is live, interactive, and tailored to your biomechanics. Based in Delhi NCR, training clients across India and globally.
         </p>
 
         {/* Coach Kush Portrait Banner */}
@@ -32,7 +38,9 @@ export const AboutPage = () => {
           <div className="rounded-3xl overflow-hidden glass-card border border-brand-border shadow-2xl relative">
             <img
               src="/assets/images/coach_kush.jpg"
-              alt="Coach Kush in Training Facility"
+              alt="Coach Kush - Online Fitness Coach and Certified Personal Trainer"
+              width="600"
+              height="450"
               className="w-full h-80 sm:h-96 object-cover object-top filter brightness-[0.95] contrast-[1.05]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-transparent flex items-end p-6">

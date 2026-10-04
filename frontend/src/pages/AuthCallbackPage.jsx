@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from '../components/common/Button';
 import { Loader2, AlertCircle, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 export const AuthCallbackPage = () => {
   const navigate = useNavigate();
@@ -135,6 +136,7 @@ export const AuthCallbackPage = () => {
   if (status === 'error') {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+        <SEO title="Authentication Error | Coach Kush" noindex={true} />
         <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-red-500/30 shadow-2xl text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
             <ShieldAlert className="w-8 h-8" />
@@ -174,6 +176,7 @@ export const AuthCallbackPage = () => {
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-12 text-center space-y-4">
+      <SEO title="Authenticating | Coach Kush" noindex={true} />
       <div className="w-14 h-14 rounded-2xl bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center text-brand-accent">
         <Loader2 className="w-7 h-7 animate-spin" />
       </div>

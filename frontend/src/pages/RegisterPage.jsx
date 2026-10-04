@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
 import { normalizePhoneNumber, isValidPhoneNumber } from '../utils/phone';
 import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
 
 const registerSchema = z
   .object({
@@ -70,6 +71,7 @@ export const RegisterPage = () => {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+      <SEO title="Register | Coach Kush" noindex={true} />
       <div className="max-w-md w-full glass-card rounded-3xl p-8 sm:p-10 border border-brand-border shadow-2xl space-y-8">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center text-brand-accent mx-auto mb-4">

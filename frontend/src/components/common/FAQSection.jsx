@@ -71,7 +71,7 @@ const CATEGORIES = [
   { id: 'coupons', label: 'Coupons & Promos', icon: Sparkles },
 ];
 
-export const FAQSection = ({ className = '', title = 'Frequently Asked Questions', subtitle = 'Everything you need to know about live virtual coaching, pricing, secured checkout, and training policies.' }) => {
+export const FAQSection = ({ className = '', title = 'Frequently Asked Questions', subtitle = 'Everything you need to know about live virtual coaching, pricing, secured checkout, and training policies.', asH1 = false }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [openId, setOpenId] = useState(FAQ_DATA[0].id);
 
@@ -89,9 +89,15 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <Badge variant="accent">Got Questions? We Have Answers</Badge>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          {title}
-        </h2>
+        {asH1 ? (
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            {title}
+          </h1>
+        ) : (
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            {title}
+          </h2>
+        )}
         <p className="text-sm text-brand-muted leading-relaxed">
           {subtitle}
         </p>

@@ -6,6 +6,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/common/Button';
 import { ShieldCheck, Lock, User, ArrowLeft, KeyRound, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { SEO } from '../../components/common/SEO';
 
 const adminLoginSchema = z.object({
   email: z.string().min(1, 'Administrator username or email is required'),
@@ -52,6 +53,7 @@ export const AdminLoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#070A0F] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+      <SEO title="Admin Login | Coach Kush" noindex={true} />
       {/* Background Ambience */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
