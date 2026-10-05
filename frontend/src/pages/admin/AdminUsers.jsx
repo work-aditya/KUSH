@@ -15,6 +15,7 @@ export const AdminUsers = () => {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin', 'users'],
     queryFn: adminService.getUsers,
+    staleTime: 30 * 1000,
   });
 
   const toggleStatusMutation = useMutation({

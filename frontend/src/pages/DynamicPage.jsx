@@ -15,6 +15,9 @@ export const DynamicPage = ({ defaultSlug }) => {
     queryKey: ['page', slug],
     queryFn: () => pageService.getPageBySlug(slug),
     retry: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: Boolean(slug),
   });
 
   if (isLoading) {

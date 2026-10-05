@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../../services/adminService';
+import { productService } from '../../services/productService';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import { formatINR } from '../../utils/formatters';
@@ -34,6 +35,7 @@ export const AdminPricing = () => {
   const createMutation = useMutation({
     mutationFn: (plan) => adminService.createPricingPlan(plan),
     onSuccess: () => {
+      productService.clearCache();
       queryClient.invalidateQueries({ queryKey: ['admin', 'pricing'] });
       queryClient.invalidateQueries({ queryKey: ['pricing', 'active'] });
       dispatch(addToast({ type: 'success', message: 'Pricing plan created' }));
@@ -45,6 +47,7 @@ export const AdminPricing = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, plan }) => adminService.updatePricingPlan(id, plan),
     onSuccess: () => {
+      productService.clearCache();
       queryClient.invalidateQueries({ queryKey: ['admin', 'pricing'] });
       queryClient.invalidateQueries({ queryKey: ['pricing', 'active'] });
       dispatch(addToast({ type: 'success', message: 'Pricing plan updated' }));
@@ -56,6 +59,7 @@ export const AdminPricing = () => {
   const deleteMutation = useMutation({
     mutationFn: (id) => adminService.deletePricingPlan(id),
     onSuccess: () => {
+      productService.clearCache();
       queryClient.invalidateQueries({ queryKey: ['admin', 'pricing'] });
       queryClient.invalidateQueries({ queryKey: ['pricing', 'active'] });
       dispatch(addToast({ type: 'info', message: 'Pricing plan removed' }));

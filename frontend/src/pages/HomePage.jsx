@@ -174,7 +174,8 @@ export const HomePage = () => {
   const { data: serverPlans, isLoading: plansLoading } = useQuery({
     queryKey: ['pricing', 'active'],
     queryFn: productService.getActivePlans,
-    staleTime: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const plans = (serverPlans && serverPlans.length > 0) ? serverPlans : DEFAULT_PLANS;

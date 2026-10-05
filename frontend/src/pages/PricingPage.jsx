@@ -31,6 +31,8 @@ export const PricingPage = () => {
   const { data: plans = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['pricing', 'active'],
     queryFn: productService.getActivePlans,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   // Admin-only test payment plan query (₹5 INR live test)
@@ -38,6 +40,8 @@ export const PricingPage = () => {
     queryKey: ['pricing', 'admin-test'],
     queryFn: productService.getAdminTestPlan,
     enabled: Boolean(isAdmin),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const handleCheckout = (plan) => {

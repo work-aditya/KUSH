@@ -13,6 +13,7 @@ export const AdminOrders = () => {
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['admin', 'orders'],
     queryFn: adminService.getOrders,
+    staleTime: 30 * 1000,
   });
 
   const filteredOrders = orders.filter((order) => {

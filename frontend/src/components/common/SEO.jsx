@@ -77,18 +77,19 @@ export const SEO = ({
 
     // 7. Dynamic JSON-LD Schema (if provided)
     let schemaScript = document.getElementById('seo-dynamic-schema');
-    if (schema) {
+    const schemaContent = schema ? (typeof schema === 'string' ? schema : JSON.stringify(schema)) : '';
+    if (schemaContent) {
       if (!schemaScript) {
         schemaScript = document.createElement('script');
         schemaScript.id = 'seo-dynamic-schema';
         schemaScript.type = 'application/ld+json';
         document.head.appendChild(schemaScript);
       }
-      schemaScript.textContent = JSON.stringify(schema);
+      schemaScript.textContent = schemaContent;
     } else if (schemaScript) {
       schemaScript.remove();
     }
-  }, [title, description, canonical, noindex, ogType, ogImage, schema]);
+  }, [title, description, canonical, noindex, ogType, ogImage, typeof schema === 'object' ? JSON.stringify(schema) : schema]);
 
   return null;
 };

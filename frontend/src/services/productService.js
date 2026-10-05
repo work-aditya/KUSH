@@ -178,108 +178,167 @@ const formatProductRecord = (p) => {
   };
 };
 
+// In-memory cache & in-flight promise deduplication to prevent duplicate SELECT products queries
+let activePlansPromise = null;
+let activePlansCache = null;
+let activePlansCacheTimestamp = 0;
+const PLANS_CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+
+let adminTestPlanPromise = null;
+let adminTestPlanCache = null;
+let adminTestPlanCacheTimestamp = 0;
+
 export const productService = {
-  // Fetch active products from PostgreSQL via Supabase
-  async getActivePlans() {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          category_id,
-          name,
-          slug,
-          plan_type,
-          description,
-          price,
-          currency,
-          duration,
-          duration_months,
-          sessions,
-          sku,
-          image_url,
-          highlighted,
-          is_active,
-          product_features (id, feature_text, display_order),
-          product_images (id, image_url, alt_text, display_order, is_primary)
-        `)
-        .eq('is_active', true)
-        .neq('slug', 'admin-test-5rs')
-        .order('price', { ascending: true });
+  // Clear in-memory product cache (called on admin updates or manual refetch)
+  clearCache() {
+    activePlansCache = null;
+    activePlansCacheTimestamp = 0;
+    activePlansPromise = null;
+    adminTestPlanCache = null;
+    adminTestPlanCacheTimestamp = 0;
+    adminTestPlanPromise = null;
+  },
 
-      if (error) {
-        console.warn('Supabase getActivePlans warning:', error.message);
-        return DEFAULT_FALLBACK_PRODUCTS;
-      }
-
-      if (!data || data.length === 0) {
-        return DEFAULT_FALLBACK_PRODUCTS;
-      }
-
-      return data.map(formatProductRecord);
-    } catch (err) {
-      console.warn('productService getActivePlans exception:', err);
-      return DEFAULT_FALLBACK_PRODUCTS;
+  // Fetch active products from PostgreSQL via Supabase with promise & TTL deduplication
+  async getActivePlans(forceRefresh = false) {
+    const now = Date.now();
+    if (!forceRefresh && activePlansCache && now - activePlansCacheTimestamp < PLANS_CACHE_TTL_MS) {
+      return activePlansCache;
     }
+
+    if (activePlansPromise) {
+      return activePlansPromise;
+    }
+
+    activePlansPromise = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            category_id,
+            name,
+            slug,
+            plan_type,
+            description,
+            price,
+            currency,
+            duration,
+            duration_months,
+            sessions,
+            sku,
+            image_url,
+            highlighted,
+            is_active,
+            product_features (id, feature_text, display_order),
+            product_images (id, image_url, alt_text, display_order, is_primary)
+          `)
+          .eq('is_active', true)
+          .neq('slug', 'admin-test-5rs')
+          .order('price', { ascending: true });
+
+        if (error) {
+          console.warn('Supabase getActivePlans warning:', error.message);
+          return DEFAULT_FALLBACK_PRODUCTS;
+        }
+
+        if (!data || data.length === 0) {
+          return DEFAULT_FALLBACK_PRODUCTS;
+        }
+
+        const formatted = data.map(formatProductRecord);
+        activePlansCache = formatted;
+        activePlansCacheTimestamp = Date.now();
+        return formatted;
+      } catch (err) {
+        console.warn('productService getActivePlans exception:', err);
+        return DEFAULT_FALLBACK_PRODUCTS;
+      } finally {
+        activePlansPromise = null;
+      }
+    })();
+
+    return activePlansPromise;
   },
 
   // Retrieve special ₹5 test payment plan strictly for admin verification
-  async getAdminTestPlan() {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          category_id,
-          name,
-          slug,
-          plan_type,
-          description,
-          price,
-          currency,
-          duration,
-          duration_months,
-          sessions,
-          sku,
-          image_url,
-          highlighted,
-          is_active,
-          product_features (id, feature_text, display_order),
-          product_images (id, image_url, alt_text, display_order, is_primary)
-        `)
-        .eq('slug', 'admin-test-5rs')
-        .single();
-
-      if (!error && data) {
-        return formatProductRecord(data);
-      }
-
-      return {
-        id: 'a0000000-0000-0000-0000-000000000005',
-        _id: 'a0000000-0000-0000-0000-000000000005',
-        name: 'Admin Live Test (₹5)',
-        title: 'Admin Live Test (₹5)',
-        slug: 'admin-test-5rs',
-        planType: 'single',
-        duration: '1 Session',
-        duration_months: 1,
-        sessions: 1,
-        price: 5,
-        currency: 'INR',
-        sku: 'CK-ADMIN-TEST-5RS',
-        highlighted: false,
-        description: 'Live Razorpay production payment pipeline test (₹5 INR verification). Strictly for administrator testing.',
-        features: [
-          'Live Razorpay ₹5 test order creation',
-          'HMAC-SHA256 signature verification test',
-          'End-to-end production webhook audit',
-          'Immediate enrollment activation verification',
-        ],
-      };
-    } catch (err) {
-      console.warn('getAdminTestPlan fallback:', err);
-      return null;
+  async getAdminTestPlan(forceRefresh = false) {
+    const now = Date.now();
+    if (!forceRefresh && adminTestPlanCache && now - adminTestPlanCacheTimestamp < PLANS_CACHE_TTL_MS) {
+      return adminTestPlanCache;
     }
+
+    if (adminTestPlanPromise) {
+      return adminTestPlanPromise;
+    }
+
+    adminTestPlanPromise = (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            category_id,
+            name,
+            slug,
+            plan_type,
+            description,
+            price,
+            currency,
+            duration,
+            duration_months,
+            sessions,
+            sku,
+            image_url,
+            highlighted,
+            is_active,
+            product_features (id, feature_text, display_order),
+            product_images (id, image_url, alt_text, display_order, is_primary)
+          `)
+          .eq('slug', 'admin-test-5rs')
+          .single();
+
+        if (!error && data) {
+          const formatted = formatProductRecord(data);
+          adminTestPlanCache = formatted;
+          adminTestPlanCacheTimestamp = Date.now();
+          return formatted;
+        }
+
+        const fallback = {
+          id: 'a0000000-0000-0000-0000-000000000005',
+          _id: 'a0000000-0000-0000-0000-000000000005',
+          name: 'Admin Live Test (₹5)',
+          title: 'Admin Live Test (₹5)',
+          slug: 'admin-test-5rs',
+          planType: 'single',
+          duration: '1 Session',
+          duration_months: 1,
+          sessions: 1,
+          price: 5,
+          currency: 'INR',
+          sku: 'CK-ADMIN-TEST-5RS',
+          highlighted: false,
+          description: 'Live Razorpay production payment pipeline test (₹5 INR verification). Strictly for administrator testing.',
+          features: [
+            'Live Razorpay ₹5 test order creation',
+            'HMAC-SHA256 signature verification test',
+            'End-to-end production webhook audit',
+            'Immediate enrollment activation verification',
+          ],
+        };
+        adminTestPlanCache = fallback;
+        adminTestPlanCacheTimestamp = Date.now();
+        return fallback;
+      } catch (err) {
+        console.warn('getAdminTestPlan fallback:', err);
+        return null;
+      } finally {
+        adminTestPlanPromise = null;
+      }
+    })();
+
+    return adminTestPlanPromise;
   },
 
   async getPlanById(id) {

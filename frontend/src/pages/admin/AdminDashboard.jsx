@@ -19,6 +19,7 @@ export const AdminDashboard = () => {
   const { data: stats, isLoading, isError } = useQuery({
     queryKey: ['admin', 'dashboard'],
     queryFn: adminService.getDashboard,
+    staleTime: 60 * 1000,
   });
 
   if (isLoading) {

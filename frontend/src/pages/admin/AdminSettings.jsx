@@ -32,25 +32,25 @@ export const AdminSettings = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('footer'); // 'footer' | 'system'
 
-  // Database & deployment health query
+  // Database & deployment health query (lightweight ping without full table count)
   const { data: dbHealth } = useQuery({
     queryKey: ['supabase-health'],
     queryFn: async () => {
       try {
-        const { error } = await supabase.from('products').select('id', { head: true, count: 'exact' });
+        const { error } = await supabase.from('site_settings').select('id', { head: true }).limit(1);
         return { database: error ? 'Degraded' : 'Connected', error: error?.message };
       } catch (err) {
         return { database: 'Offline', error: err.message };
       }
     },
-    staleTime: 30000,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Site / Footer settings query
   const { data: siteSettings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ['site-settings'],
     queryFn: settingsService.getSiteSettings,
-    staleTime: 10000,
+    staleTime: 60 * 1000,
   });
 
   // Form state

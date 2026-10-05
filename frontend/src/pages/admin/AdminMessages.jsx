@@ -14,6 +14,7 @@ export const AdminMessages = () => {
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ['admin', 'messages'],
     queryFn: adminService.getMessages,
+    staleTime: 30 * 1000,
   });
 
   const statusMutation = useMutation({

@@ -16,56 +16,88 @@ export const DEFAULT_SETTINGS = {
     'CoachKush. All rights reserved. Designed for elite performance & online accountability.',
 };
 
+let inFlightSettingsPromise = null;
+let settingsMemoryCache = null;
+let settingsMemoryTimestamp = 0;
+const SETTINGS_CACHE_TTL_MS = 2 * 60 * 1000;
+
 export const settingsService = {
+  clearCache() {
+    settingsMemoryCache = null;
+    settingsMemoryTimestamp = 0;
+    inFlightSettingsPromise = null;
+  },
+
   /**
    * Retrieve active site settings with resilient fallback to local cache and defaults.
    */
-  async getSiteSettings() {
-    // 1. Check local cached copy first for instant hydration
-    let cached = null;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        cached = JSON.parse(raw);
-        // Automatically migrate legacy instagram url if present
-        if (cached.instagram_url === 'https://instagram.com/coachkush') {
-          cached.instagram_url = 'https://instagram.com/coachhkush';
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
+  async getSiteSettings(forceRefresh = false) {
+    const now = Date.now();
+    if (!forceRefresh && settingsMemoryCache && now - settingsMemoryTimestamp < SETTINGS_CACHE_TTL_MS) {
+      return settingsMemoryCache;
+    }
+
+    if (inFlightSettingsPromise) {
+      return inFlightSettingsPromise;
+    }
+
+    inFlightSettingsPromise = (async () => {
+      // 1. Check local cached copy first for instant hydration
+      let cached = null;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          cached = JSON.parse(raw);
+          // Automatically migrate legacy instagram url if present
+          if (cached.instagram_url === 'https://instagram.com/coachkush') {
+            cached.instagram_url = 'https://instagram.com/coachhkush';
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
+          }
         }
+      } catch {
+        // ignore JSON parse issue
       }
-    } catch {
-      // ignore JSON parse issue
-    }
 
-    try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .eq('id', 'general')
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('*')
+          .eq('id', 'general')
+          .maybeSingle();
 
-      if (!error && data) {
-        const merged = { ...DEFAULT_SETTINGS, ...data };
-        // Migrate legacy instagram url if returned from db
-        if (merged.instagram_url === 'https://instagram.com/coachkush') {
-          merged.instagram_url = 'https://instagram.com/coachhkush';
+        if (!error && data) {
+          const merged = { ...DEFAULT_SETTINGS, ...data };
+          // Migrate legacy instagram url if returned from db
+          if (merged.instagram_url === 'https://instagram.com/coachkush') {
+            merged.instagram_url = 'https://instagram.com/coachhkush';
+          }
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          } catch {
+            // ignore storage quota error
+          }
+          settingsMemoryCache = merged;
+          settingsMemoryTimestamp = Date.now();
+          return merged;
         }
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-        } catch {
-          // ignore storage quota error
-        }
-        return merged;
+      } catch (err) {
+        console.warn('site_settings lookup warning:', err.message);
+      } finally {
+        inFlightSettingsPromise = null;
       }
-    } catch (err) {
-      console.warn('site_settings lookup warning:', err.message);
-    }
 
-    if (cached) {
-      return cached;
-    }
+      if (cached) {
+        settingsMemoryCache = cached;
+        settingsMemoryTimestamp = Date.now();
+        return cached;
+      }
 
-    return DEFAULT_SETTINGS;
+      settingsMemoryCache = DEFAULT_SETTINGS;
+      settingsMemoryTimestamp = Date.now();
+      return DEFAULT_SETTINGS;
+    })();
+
+    return inFlightSettingsPromise;
   },
 
   /**

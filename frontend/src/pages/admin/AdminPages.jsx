@@ -24,6 +24,7 @@ export const AdminPages = () => {
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ['admin', 'pages'],
     queryFn: adminService.getPages,
+    staleTime: 60 * 1000,
   });
 
   const createMutation = useMutation({

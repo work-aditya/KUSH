@@ -24,12 +24,15 @@ export const ToastContainer = () => {
 };
 
 const ToastItem = ({ toast, onClose }) => {
+  const onCloseRef = React.useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose();
+      onCloseRef.current?.();
     }, toast.duration || 4000);
     return () => clearTimeout(timer);
-  }, [toast, onClose]);
+  }, [toast.id, toast.duration]);
 
   const icons = {
     success: <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />,

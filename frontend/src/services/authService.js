@@ -4,6 +4,12 @@ import { normalizePhoneNumber } from '../utils/phone.js';
 
 const ADMIN_ROLE_ID = '22b2bf47-cdc5-413b-a67c-ebe9ab657981';
 
+// In-flight promise & short TTL cache to prevent duplicate getMe queries
+let inFlightGetMePromise = null;
+let cachedMe = null;
+let cachedMeTimestamp = 0;
+const ME_CACHE_TTL_MS = 15 * 1000; // 15 seconds
+
 /**
  * Maps Supabase & PostgreSQL errors to user-friendly messages without leaking
  * database details, error codes (e.g. 23505), or internal stack traces.
@@ -293,8 +299,16 @@ export const authService = {
     return { user: formattedUser, session: data.session };
   },
 
+  // Clear auth cache helper
+  clearAuthCache() {
+    cachedMe = null;
+    cachedMeTimestamp = 0;
+    inFlightGetMePromise = null;
+  },
+
   // 4. Sign Out
   async logout() {
+    this.clearAuthCache();
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.warn('Sign out warning:', error.message);
@@ -302,12 +316,35 @@ export const authService = {
     return { success: true };
   },
 
-  // 5. Retrieve current session user
-  async getMe() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) return null;
+  // 5. Retrieve current session user with in-flight promise deduplication
+  async getMe(forceRefresh = false) {
+    const now = Date.now();
+    if (!forceRefresh && cachedMe && now - cachedMeTimestamp < ME_CACHE_TTL_MS) {
+      return cachedMe;
+    }
 
-    return await formatUserData(session.user);
+    if (inFlightGetMePromise) {
+      return inFlightGetMePromise;
+    }
+
+    inFlightGetMePromise = (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          cachedMe = null;
+          return null;
+        }
+
+        const formatted = await formatUserData(session.user);
+        cachedMe = formatted;
+        cachedMeTimestamp = Date.now();
+        return formatted;
+      } finally {
+        inFlightGetMePromise = null;
+      }
+    })();
+
+    return inFlightGetMePromise;
   },
 
   // 6. Request Password Reset Link with Recovery Redirect

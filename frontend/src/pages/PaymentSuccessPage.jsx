@@ -29,8 +29,10 @@ export const PaymentSuccessPage = () => {
     queryFn: () => paymentService.getPaymentStatus(orderRef),
     enabled: !!orderRef,
     refetchInterval: (query) => {
-      // If status is still pending, poll every 3 seconds up to a few attempts
-      return query.state.data?.status === 'pending' ? 3000 : false;
+      // If status is still pending, poll every 3 seconds up to a maximum of 10 attempts (30s)
+      if (query.state.data?.status !== 'pending') return false;
+      if ((query.state.dataUpdateCount || 0) >= 10) return false;
+      return 3000;
     },
   });
 

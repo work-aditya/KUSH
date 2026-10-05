@@ -6,6 +6,11 @@ import { supabase } from '../lib/supabaseClient';
 import { setUser, clearUser, setLoading } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 
+// Module-level singleton listener management across all useAuth hook consumers
+let globalAuthSubscription = null;
+let activeHookCount = 0;
+const dispatchCallbacks = new Set();
+
 export const useAuth = () => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -18,12 +23,13 @@ export const useAuth = () => {
     sessionStorage.getItem('ck_recovery_active') === 'true'
   );
 
-  // Initial user fetch
+  // Initial user fetch (cached for 5 minutes)
   const { data: initialUser, isFetched, isError } = useQuery({
     queryKey: ['auth', 'me'],
-    queryFn: authService.getMe,
+    queryFn: () => authService.getMe(),
     retry: false,
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     enabled: !isRecoveryActive,
   });
 
@@ -40,52 +46,70 @@ export const useAuth = () => {
     }
   }, [initialUser, isFetched, isError, dispatch, isRecoveryActive]);
 
-  // Supabase Auth State Change Listener
+  // Shared Singleton Supabase Auth State Change Listener
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // 1. Password Recovery Flow - Never treat as normal dashboard login session
-      if (event === 'PASSWORD_RECOVERY') {
-        sessionStorage.setItem('ck_recovery_active', 'true');
-        return;
-      }
+    activeHookCount++;
+    dispatchCallbacks.add(dispatch);
 
-      const isRecovery = typeof window !== 'undefined' && (
-        window.location.pathname.includes('/reset-password') ||
-        sessionStorage.getItem('ck_recovery_active') === 'true'
-      );
-
-      if (isRecovery && event !== 'SIGNED_OUT') {
-        return;
-      }
-
-      // 2. Normal authenticated session
-      if (session?.user) {
-        const userObj = await authService.getMe();
-        if (userObj) {
-          dispatch(setUser(userObj));
-        } else {
-          dispatch(clearUser());
+    if (!globalAuthSubscription) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        // 1. Password Recovery Flow - Never treat as normal dashboard login session
+        if (event === 'PASSWORD_RECOVERY') {
+          sessionStorage.setItem('ck_recovery_active', 'true');
+          return;
         }
 
-        if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
-          dispatch(addToast({ type: 'success', message: 'Email verified successfully! Welcome to CoachKush.' }));
-          window.history.replaceState(null, '', window.location.pathname);
+        const isRecovery = typeof window !== 'undefined' && (
+          window.location.pathname.includes('/reset-password') ||
+          sessionStorage.getItem('ck_recovery_active') === 'true'
+        );
+
+        if (isRecovery && event !== 'SIGNED_OUT') {
+          return;
         }
-      } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
-        if (!session?.user) {
-          dispatch(clearUser());
+
+        // 2. Normal authenticated session
+        if (session?.user) {
+          const userObj = await authService.getMe(true);
+          dispatchCallbacks.forEach((cb) => {
+            if (userObj) {
+              cb(setUser(userObj));
+            } else {
+              cb(clearUser());
+            }
+          });
+
+          if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
+            dispatchCallbacks.forEach((cb) =>
+              cb(addToast({ type: 'success', message: 'Email verified successfully! Welcome to CoachKush.' }))
+            );
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+          if (!session?.user) {
+            dispatchCallbacks.forEach((cb) => cb(clearUser()));
+          }
         }
-      }
-    });
+      });
+
+      globalAuthSubscription = subscription;
+    }
 
     return () => {
-      subscription?.unsubscribe();
+      dispatchCallbacks.delete(dispatch);
+      activeHookCount--;
+      if (activeHookCount <= 0) {
+        globalAuthSubscription?.unsubscribe();
+        globalAuthSubscription = null;
+        activeHookCount = 0;
+      }
     };
   }, [dispatch]);
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
+      authService.clearAuthCache();
       dispatch(setUser(data.user));
       dispatch(addToast({ type: 'success', message: `Welcome back, ${data.user.name}!` }));
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
@@ -98,6 +122,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data) => {
+      authService.clearAuthCache();
       dispatch(setUser(data.user));
       dispatch(addToast({ type: 'success', message: 'Account registered successfully!' }));
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
@@ -110,6 +135,7 @@ export const useAuth = () => {
   const adminLoginMutation = useMutation({
     mutationFn: authService.adminLogin,
     onSuccess: (data) => {
+      authService.clearAuthCache();
       dispatch(setUser(data.user));
       dispatch(addToast({ type: 'success', message: `Admin access granted. Welcome ${data.user.name}!` }));
       queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
@@ -122,6 +148,7 @@ export const useAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
+      authService.clearAuthCache();
       dispatch(clearUser());
       dispatch(addToast({ type: 'info', message: 'You have been logged out' }));
       queryClient.clear();

@@ -43,6 +43,7 @@ export const AdminCoupons = () => {
   const { data: coupons = [], isLoading } = useQuery({
     queryKey: ['admin', 'coupons'],
     queryFn: adminService.getCoupons,
+    staleTime: 60 * 1000,
   });
 
   const createMutation = useMutation({
