@@ -6,7 +6,7 @@ import { Badge } from '../../components/common/Badge';
 import { formatINR } from '../../utils/formatters';
 import { useDispatch } from 'react-redux';
 import { addToast } from '../../store/slices/uiSlice';
-import { Plus, Edit2, Trash2, CheckCircle, XCircle, Loader2, ArrowUpDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, XCircle, Loader2, ArrowUpDown, ShieldCheck } from 'lucide-react';
 
 export const AdminPricing = () => {
   const queryClient = useQueryClient();
@@ -141,10 +141,21 @@ export const AdminPricing = () => {
             Create, update, enable/disable, and reorder dynamic packages displayed to trainees.
           </p>
         </div>
-        <Button onClick={openCreateModal} className="gap-2 self-start">
-          <Plus className="w-4 h-4" />
-          Create New Package
-        </Button>
+        <div className="flex flex-wrap gap-2.5 self-start">
+          <a
+            href="/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-colors"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Test ₹5 Live Payment Card
+          </a>
+          <Button onClick={openCreateModal} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Create New Package
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

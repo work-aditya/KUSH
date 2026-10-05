@@ -3,6 +3,7 @@
 // Rule: Never trust frontend price or payment status
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.0";
+import { sendPurchaseConfirmationEmail } from "../_shared/purchaseEmail.ts";
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("origin") || "*";
@@ -24,6 +25,7 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const razorpayKeyId = Deno.env.get("RAZORPAY_KEY_ID");
     const razorpayKeySecret = Deno.env.get("RAZORPAY_KEY_SECRET");
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
 
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error("Supabase server environment variables not configured");
@@ -80,6 +82,32 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Requested product was not found or is inactive" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Admin-only test payment protection: ensure only verified admin accounts can purchase test products
+    if (product.slug === "admin-test-5rs") {
+      const { data: isAdm } = await supabase.rpc("is_admin");
+      const { data: userRoles } = await supabase
+        .from("user_roles")
+        .select("role_id, roles(name)")
+        .eq("user_id", user.id);
+
+      const hasAdminPrivilege =
+        isAdm === true ||
+        (userRoles || []).some(
+          (ur: any) =>
+            ur.roles?.name === "admin" ||
+            ur.role_id === "22b2bf47-cdc5-413b-a67c-ebe9ab657981"
+        ) ||
+        user.app_metadata?.role === "admin" ||
+        user.user_metadata?.role === "admin";
+
+      if (!hasAdminPrivilege) {
+        return new Response(
+          JSON.stringify({ error: "Access denied. Admin test product is restricted to administrators." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const qty = Math.max(1, parseInt(quantity, 10) || 1);
@@ -198,6 +226,37 @@ Deno.serve(async (req) => {
           .from("coupons")
           .update({ used_count: (validatedCoupon.used_count || 0) + 1 })
           .eq("id", validatedCoupon.id);
+      }
+
+      // Send automated Purchase Confirmation Email for free order
+      try {
+        const recipientName =
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          user.email?.split("@")[0] ||
+          "Athlete";
+
+        if (user.email) {
+          await sendPurchaseConfirmationEmail({
+            resendApiKey: resendApiKey || "",
+            recipientEmail: user.email,
+            recipientName: recipientName,
+            orderNumber: order.order_number,
+            planName: product.name || "Coaching Program",
+            amount: 0,
+            currency: "INR",
+          });
+
+          await supabase.from("order_status_history").insert({
+            order_id: order.id,
+            old_status: "pending",
+            new_status: "paid",
+            changed_by: user.id,
+            note: `Purchase confirmation email sent to ${user.email} (free order)`,
+          });
+        }
+      } catch (emailErr) {
+        console.error("Non-critical free order email sending error:", emailErr);
       }
 
       return new Response(

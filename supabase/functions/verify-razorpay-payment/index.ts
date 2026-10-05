@@ -3,6 +3,7 @@
 // Rule: Verify Razorpay signatures server-side. Never trust frontend payment status.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.0";
+import { sendPurchaseConfirmationEmail } from "../_shared/purchaseEmail.ts";
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("origin") || "*";
@@ -38,6 +39,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const razorpayKeySecret = Deno.env.get("RAZORPAY_KEY_SECRET");
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
 
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error("Supabase server environment variables not configured");
@@ -207,6 +209,37 @@ Deno.serve(async (req) => {
           .update({ used_count: (c.used_count || 0) + 1 })
           .eq("id", c.id);
       }
+    }
+
+    // 10. Send automated Purchase Confirmation Email
+    try {
+      const recipientName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "Athlete";
+
+      if (user.email) {
+        await sendPurchaseConfirmationEmail({
+          resendApiKey: resendApiKey || "",
+          recipientEmail: user.email,
+          recipientName: recipientName,
+          orderNumber: order.order_number,
+          planName: purchasedProduct?.product_name || "Coaching Program",
+          amount: order.total_amount,
+          currency: order.currency || "INR",
+        });
+
+        await supabase.from("order_status_history").insert({
+          order_id: order.id,
+          old_status: "paid",
+          new_status: "paid",
+          changed_by: user.id,
+          note: `Purchase confirmation email sent to ${user.email}`,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Non-critical error sending purchase confirmation email:", emailErr);
     }
 
     return new Response(

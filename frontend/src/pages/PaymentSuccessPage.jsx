@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Calendar,
   Clock,
+  Mail,
 } from 'lucide-react';
 import { SEO } from '../components/common/SEO';
 
@@ -132,35 +133,57 @@ export const PaymentSuccessPage = () => {
           </div>
         </div>
 
-        {/* Next Steps: WhatsApp & Invoicing */}
+        {/* Next Steps: Contact Coach Kush */}
         <div className="space-y-4 pt-2">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Video className="w-5 h-5 text-brand-accent" />
-            Next Step: Connect on WhatsApp to Schedule Live Sessions
-          </h3>
-          <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
-            Kush conducts intake assessments and session bookings directly over WhatsApp. Message Kush right now with your order reference to lock in your preferred time slot on Google Meet or Zoom.
-          </p>
+          <div className="border border-brand-accent/30 bg-brand-surface/80 rounded-2xl p-6 space-y-4">
+            <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <Video className="w-5 h-5 text-brand-accent" />
+              Immediate Next Step: Contact Coach Kush to Begin
+            </h3>
+            <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
+              Coach Kush conducts 1-on-1 intake assessments and session bookings directly. Please reach out right now via WhatsApp or email to lock in your preferred training schedule on Google Meet or Zoom:
+            </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <WhatsAppButton
-              text="Message Kush to Start Training (+91 70428 58524)"
-              url={`https://wa.me/917042858524?text=${encodeURIComponent(`Hi Kush, I just completed my coaching booking! Order ID: ${data?.orderId || ''}`)}`}
-              className="w-full text-center"
-            />
-            {data?.orderId && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <WhatsAppButton
+                text="Message Kush on WhatsApp (+91 70428 58524)"
+                url={`https://wa.me/917042858524?text=${encodeURIComponent(`Hi Kush, I just completed my coaching booking! Order ID: ${data?.orderId || data?.merchantTransactionId || ''}`)}`}
+                className="w-full text-center"
+              />
+              {data?.orderId && (
+                <a
+                  href={paymentService.getInvoiceDownloadUrl(data.orderId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
+                  <Button variant="secondary" size="md" className="w-full gap-2">
+                    <FileDown className="w-4 h-4 text-brand-accent" />
+                    Download Official Tax Invoice (PDF)
+                  </Button>
+                </a>
+              )}
+            </div>
+
+            {/* Direct Email Contacts */}
+            <div className="pt-3 border-t border-brand-border/60 flex flex-wrap items-center gap-3 text-xs text-brand-muted">
+              <span className="font-semibold text-white">Email Coach Kush:</span>
               <a
-                href={paymentService.getInvoiceDownloadUrl(data.orderId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full"
+                href="mailto:support@coachkush.in"
+                className="flex items-center gap-1.5 text-brand-accent hover:underline font-medium"
               >
-                <Button variant="secondary" size="md" className="w-full gap-2">
-                  <FileDown className="w-4 h-4 text-brand-accent" />
-                  Download Official Tax Invoice (PDF)
-                </Button>
+                <Mail className="w-3.5 h-3.5" />
+                support@coachkush.in
               </a>
-            )}
+              <span>or</span>
+              <a
+                href="mailto:jeekush460@gmail.com"
+                className="flex items-center gap-1.5 text-brand-accent hover:underline font-medium"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                jeekush460@gmail.com
+              </a>
+            </div>
           </div>
         </div>
 
@@ -168,7 +191,7 @@ export const PaymentSuccessPage = () => {
         <div className="p-4 rounded-xl bg-brand-card border border-brand-border/80 flex items-center gap-3 text-xs text-brand-muted">
           <CheckCircle2 className="w-4 h-4 text-brand-accent shrink-0" />
           <span>
-            A formal confirmation and PDF tax invoice have also been sent to your registered email address.
+            An automated purchase confirmation and official receipt have been sent to your registered email address.
           </span>
         </div>
       </div>

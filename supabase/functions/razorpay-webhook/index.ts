@@ -3,6 +3,7 @@
 // Rule: Idempotently process official Razorpay webhook events with signature verification
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.42.0";
+import { sendPurchaseConfirmationEmail } from "../_shared/purchaseEmail.ts";
 
 async function verifyHmacSha256(secret, rawPayload, expectedHex) {
   const encoder = new TextEncoder();
@@ -28,6 +29,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const webhookSecret = Deno.env.get("RAZORPAY_WEBHOOK_SECRET");
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
 
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error("Supabase server environment variables not configured");
@@ -142,6 +144,59 @@ Deno.serve(async (req) => {
               status: "active",
             });
           }
+        }
+
+        // Fallback: Send automated Purchase Confirmation Email if not already sent
+        try {
+          const { data: alreadySent } = await supabase
+            .from("order_status_history")
+            .select("id")
+            .eq("order_id", internalPayment.order_id)
+            .ilike("note", "%Purchase confirmation email sent%")
+            .limit(1);
+
+          if (!alreadySent || alreadySent.length === 0) {
+            const { data: userData } = await supabase.auth.admin.getUserById(customerId);
+            const user = userData?.user;
+            if (user?.email) {
+              const { data: profile } = await supabase
+                .from("profiles")
+                .select("full_name")
+                .eq("id", customerId)
+                .single();
+
+              const recipientName =
+                profile?.full_name ||
+                user.user_metadata?.full_name ||
+                user.user_metadata?.name ||
+                user.email.split("@")[0] ||
+                "Athlete";
+
+              const purchasedItem = internalPayment.orders?.order_items?.[0];
+
+              await sendPurchaseConfirmationEmail({
+                resendApiKey: resendApiKey || "",
+                recipientEmail: user.email,
+                recipientName: recipientName,
+                orderNumber:
+                  internalPayment.orders?.order_number ||
+                  `ORD-${internalPayment.order_id.slice(0, 8)}`,
+                planName: purchasedItem?.product_name || "Coaching Program",
+                amount: internalPayment.orders?.total_amount || internalPayment.amount,
+                currency: internalPayment.orders?.currency || "INR",
+              });
+
+              await supabase.from("order_status_history").insert({
+                order_id: internalPayment.order_id,
+                old_status: "paid",
+                new_status: "paid",
+                changed_by: customerId,
+                note: `Purchase confirmation email sent to ${user.email} (webhook fallback)`,
+              });
+            }
+          }
+        } catch (emailErr) {
+          console.error("Non-critical webhook email sending error:", emailErr);
         }
       }
     } else if (eventType === "payment.failed") {

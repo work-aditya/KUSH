@@ -192,8 +192,8 @@ export const HomePage = () => {
   return (
     <div className="space-y-24 sm:space-y-36 pb-24 overflow-hidden">
       <SEO
-        title="Coach Kush | Online Fitness Coach & Virtual Coaching | coachkush.in"
-        description="Coach Kush provides personalized online fitness coaching, live 1-on-1 virtual training, and couple coaching over Google Meet and Zoom. Transform your fitness with coachkush.in."
+        title="Coach Kush | Kush Coach - Online Fitness Coach & Virtual Coaching | coachkush.in"
+        description="Coach Kush (Kush Coach) provides personalized online fitness coaching, live 1-on-1 virtual training, and couple coaching over Google Meet and Zoom. Transform your fitness with coachkush.in."
         canonical="/"
       />
       {/* 1. HERO SECTION WITH COACH KUSH VISUAL */}

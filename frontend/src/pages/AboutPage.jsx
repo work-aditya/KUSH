@@ -19,8 +19,8 @@ export const AboutPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-24">
       <SEO
-        title="About Coach Kush | Virtual Personal Trainer & Fitness Coach | coachkush.in"
-        description="Learn about Coach Kush, certified online fitness coach and virtual trainer based in Delhi NCR, delivering live 1-on-1 and couple coaching across India & worldwide on coachkush.in."
+        title="About Coach Kush | Kush Coach - Virtual Trainer & Online Coach | coachkush.in"
+        description="Learn about Coach Kush (Kush Coach), certified online fitness coach and virtual trainer based in Delhi NCR, delivering live 1-on-1 and couple coaching across India & worldwide on coachkush.in."
         canonical="/about"
       />
       {/* 1. Header */}

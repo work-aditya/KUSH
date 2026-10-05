@@ -30,8 +30,8 @@ console.log('   sitemap.xml verified successfully.');
 // 3. Check dist/index.html
 const indexHtml = fs.readFileSync('dist/index.html', 'utf8');
 console.log('3. dist/index.html exists. Length:', indexHtml.length);
-if (!indexHtml.includes('<title>Coach Kush | Online Fitness Coach & Virtual Coaching | coachkush.in</title>')) {
-  throw new Error('index.html missing primary SEO title!');
+if (!indexHtml.includes('Coach Kush') || !indexHtml.includes('Kush Coach')) {
+  throw new Error('index.html missing primary SEO terms for Coach Kush & Kush Coach!');
 }
 if (!indexHtml.includes('https://coachkush.in/')) {
   throw new Error('index.html missing canonical URL for https://coachkush.in/!');
@@ -39,6 +39,20 @@ if (!indexHtml.includes('https://coachkush.in/')) {
 if (indexHtml.includes('cochkush.in')) {
   throw new Error('index.html still has typo domain cochkush.in!');
 }
+
+// 4. Check Google Search Favicons in HTML and dist directory
+if (!indexHtml.includes('rel="icon" type="image/x-icon" href="/favicon.ico"') ||
+    !indexHtml.includes('rel="icon" type="image/png" sizes="48x48"')) {
+  throw new Error('index.html missing Google Search compliant favicon tags!');
+}
+
+if (!fs.existsSync('dist/favicon.ico')) {
+  throw new Error('dist/favicon.ico does not exist!');
+}
+if (!fs.existsSync('dist/assets/logo/favicon-48x48.png')) {
+  throw new Error('dist/assets/logo/favicon-48x48.png (Google 48px multiple) does not exist!');
+}
+console.log('   Google Search favicon tags & artifacts verified successfully.');
 
 const match = indexHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
 if (!match) {

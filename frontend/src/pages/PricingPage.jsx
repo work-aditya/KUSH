@@ -22,15 +22,22 @@ import {
 } from 'lucide-react';
 
 export const PricingPage = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all'); // 'all', 'single', 'couple'
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState(null);
 
-  // Fetch active plans from Supabase PostgreSQL
+  // Fetch active plans from Supabase PostgreSQL (admin-test-5rs excluded for public)
   const { data: plans = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['pricing', 'active'],
     queryFn: productService.getActivePlans,
+  });
+
+  // Admin-only test payment plan query (₹5 INR live test)
+  const { data: adminTestPlan } = useQuery({
+    queryKey: ['pricing', 'admin-test'],
+    queryFn: productService.getAdminTestPlan,
+    enabled: Boolean(isAdmin),
   });
 
   const handleCheckout = (plan) => {
@@ -50,8 +57,8 @@ export const PricingPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-16">
       <SEO
-        title="Plans & Pricing | Online Fitness Coaching Packages | Coach Kush | coachkush.in"
-        description="Explore online fitness coaching plans and pricing by Coach Kush on coachkush.in. Transparent rates for live 1-on-1 virtual training, couple workouts, and custom diet plans."
+        title="Plans & Pricing | Coach Kush & Kush Coach Online Fitness Packages | coachkush.in"
+        description="Explore online fitness coaching plans and pricing by Coach Kush (Kush Coach) on coachkush.in. Transparent rates for live 1-on-1 virtual training, couple workouts, and custom diet plans."
         canonical="/pricing"
       />
       {/* Header */}
@@ -102,6 +109,76 @@ export const PricingPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Admin-Only Live Payment Verification Card (₹5 INR) */}
+      {isAdmin && (
+        <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-amber-500/10 via-brand-card to-emerald-500/10 border-2 border-brand-accent/60 shadow-2xl shadow-brand-accent/10 space-y-5 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-accent animate-ping" />
+              <Badge variant="accent">Administrator Verification Card</Badge>
+              <span className="text-xs font-mono font-bold text-brand-emerald bg-brand-surface px-2.5 py-1 rounded-md border border-brand-emerald/30">
+                ₹5 INR Live Razorpay Test
+              </span>
+            </div>
+            <span className="text-[11px] text-brand-muted font-mono">
+              Live Gateway Active • Strictly visible to role="admin"
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div className="lg:col-span-8 space-y-2">
+              <div className="flex items-baseline gap-3">
+                <h3 className="text-xl sm:text-2xl font-black text-white">
+                  Admin Production Test Payment
+                </h3>
+                <span className="text-2xl sm:text-3xl font-black text-brand-accent">₹5</span>
+              </div>
+              <p className="text-xs text-brand-muted leading-relaxed">
+                Test the live production payment gateway end-to-end for ₹5. This triggers the real Razorpay modal, tests card/UPI acceptance on the live account, verifies cryptographic HMAC-SHA256 signatures via Supabase Edge Functions, and audits database enrollment creation without charging full membership rates.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-brand-text">
+                <span className="inline-flex items-center gap-1 bg-brand-surface px-2.5 py-1 rounded-lg border border-brand-border">
+                  <CheckCircle className="w-3.5 h-3.5 text-brand-emerald" /> Live Razorpay Order (500 paise)
+                </span>
+                <span className="inline-flex items-center gap-1 bg-brand-surface px-2.5 py-1 rounded-lg border border-brand-border">
+                  <CheckCircle className="w-3.5 h-3.5 text-brand-emerald" /> Server-side Edge Function Verified
+                </span>
+                <span className="inline-flex items-center gap-1 bg-brand-surface px-2.5 py-1 rounded-lg border border-brand-border">
+                  <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" /> Hidden from non-admin visitors
+                </span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 flex justify-end">
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto text-xs font-bold uppercase tracking-wider gap-2 shadow-xl shadow-brand-accent/25 hover:scale-[1.02] transition-transform"
+                onClick={() =>
+                  handleCheckout(
+                    adminTestPlan || {
+                      id: 'admin-test-5rs',
+                      _id: 'a0000000-0000-0000-0000-000000000005',
+                      title: 'Admin Live Test Payment (₹5)',
+                      name: 'Admin Live Test Payment (₹5)',
+                      slug: 'admin-test-5rs',
+                      price: 5,
+                      sessions: 1,
+                      duration: '1 Session',
+                      description: 'Admin ₹5 Live Razorpay Verification Test',
+                    }
+                  )
+                }
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Pay ₹5 Test Payment
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pricing Cards Grid */}
       {isLoading ? (

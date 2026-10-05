@@ -258,9 +258,10 @@ const welcomeHtml = `<!DOCTYPE html>
       <tr>
         <td class="footer-td">
           <p style="margin: 0 0 8px 0;">
-            Questions about your schedule or invoice? Contact us at 
-            <a href="mailto:support@coachkush.in" class="footer-link">support@coachkush.in</a> or 
-            <a href="https://wa.me/917042858524" class="footer-link">+91 70428 58524</a>.
+            Contact Coach Kush: 
+            <a href="https://wa.me/917042858524" class="footer-link">+91 70428 58524</a> &bull; 
+            <a href="mailto:support@coachkush.in" class="footer-link">support@coachkush.in</a> &bull; 
+            <a href="mailto:jeekush460@gmail.com" class="footer-link">jeekush460@gmail.com</a>
           </p>
           <p style="margin: 0;">
             &copy; ${new Date().getFullYear()} CoachKush Fitness. All rights reserved. &bull; 
@@ -280,7 +281,7 @@ const welcomeHtml = `<!DOCTYPE html>
   const { data, error } = await resend.emails.send({
     from: 'Coach Kush <support@coachkush.in>',
     to: [recipient],
-    replyTo: 'support@coachkush.in',
+    replyTo: ['support@coachkush.in', 'jeekush460@gmail.com'],
     subject: `Welcome to CoachKush, ${clientName}! Thank You for Joining 🔥`,
     html: welcomeHtml,
   });

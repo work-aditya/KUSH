@@ -204,6 +204,7 @@ export const productService = {
           product_images (id, image_url, alt_text, display_order, is_primary)
         `)
         .eq('is_active', true)
+        .neq('slug', 'admin-test-5rs')
         .order('price', { ascending: true });
 
       if (error) {
@@ -219,6 +220,65 @@ export const productService = {
     } catch (err) {
       console.warn('productService getActivePlans exception:', err);
       return DEFAULT_FALLBACK_PRODUCTS;
+    }
+  },
+
+  // Retrieve special ₹5 test payment plan strictly for admin verification
+  async getAdminTestPlan() {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          id,
+          category_id,
+          name,
+          slug,
+          plan_type,
+          description,
+          price,
+          currency,
+          duration,
+          duration_months,
+          sessions,
+          sku,
+          image_url,
+          highlighted,
+          is_active,
+          product_features (id, feature_text, display_order),
+          product_images (id, image_url, alt_text, display_order, is_primary)
+        `)
+        .eq('slug', 'admin-test-5rs')
+        .single();
+
+      if (!error && data) {
+        return formatProductRecord(data);
+      }
+
+      return {
+        id: 'a0000000-0000-0000-0000-000000000005',
+        _id: 'a0000000-0000-0000-0000-000000000005',
+        name: 'Admin Live Test (₹5)',
+        title: 'Admin Live Test (₹5)',
+        slug: 'admin-test-5rs',
+        planType: 'single',
+        duration: '1 Session',
+        duration_months: 1,
+        sessions: 1,
+        price: 5,
+        currency: 'INR',
+        sku: 'CK-ADMIN-TEST-5RS',
+        highlighted: false,
+        description: 'Live Razorpay production payment pipeline test (₹5 INR verification). Strictly for administrator testing.',
+        features: [
+          'Live Razorpay ₹5 test order creation',
+          'HMAC-SHA256 signature verification test',
+          'End-to-end production webhook audit',
+          'Immediate enrollment activation verification',
+        ],
+      };
+    } catch (err) {
+      console.warn('getAdminTestPlan fallback:', err);
+      return null;
     }
   },
 

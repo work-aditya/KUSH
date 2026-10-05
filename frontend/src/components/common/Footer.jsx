@@ -20,14 +20,14 @@ export const Footer = () => {
     staleTime: 60 * 1000,
   });
 
-  const whatsappUrl =
-    settings?.whatsapp_url ||
-    import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
-    'https://wa.me/917042858524';
+  // Footer WhatsApp URL with prefilled query: "Hey! can i get more information on this"
+  const footerWhatsappMessage = 'Hey! can i get more information on this';
+  const whatsappUrl = `https://wa.me/917042858524?text=${encodeURIComponent(footerWhatsappMessage)}`;
   const whatsappNumber = settings?.whatsapp_number || '+91 70428 58524';
   const instagramUrl = settings?.instagram_url || 'https://instagram.com/coachhkush';
   const youtubeUrl = settings?.youtube_url;
   const supportEmail = settings?.email || 'support@coachkush.in';
+  const coachEmail = 'jeekush460@gmail.com';
   const tagline =
     settings?.footer_tagline ||
     'Elite 1-on-1 and partner fitness coaching led directly by Kush. Delivering tailored body transformations, strength conditioning, and progressive overload tracking through live, interactive video coaching on Google Meet and Zoom.';
@@ -173,6 +173,30 @@ export const Footer = () => {
                 </a>
               </li>
 
+              {/* Support Email */}
+              <li>
+                <a
+                  href={`mailto:${supportEmail}`}
+                  className="flex items-center gap-2 text-brand-muted hover:text-white transition-colors group"
+                >
+                  <Mail className="w-4 h-4 text-brand-accent shrink-0" />
+                  <span>{supportEmail}</span>
+                  <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                </a>
+              </li>
+
+              {/* Direct Coach Email */}
+              <li>
+                <a
+                  href={`mailto:${coachEmail}`}
+                  className="flex items-center gap-2 text-brand-muted hover:text-white transition-colors group"
+                >
+                  <Mail className="w-4 h-4 text-brand-accent shrink-0" />
+                  <span>{coachEmail}</span>
+                  <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                </a>
+              </li>
+
               {/* Instagram Item */}
               {instagramUrl && (
                 <li>
@@ -191,9 +215,9 @@ export const Footer = () => {
 
               {/* Contact Form */}
               <li>
-                <Link to="/contact" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Link to="/contact" className="flex items-center gap-2 text-brand-muted hover:text-white transition-colors">
                   <Mail className="w-4 h-4 text-brand-muted shrink-0" />
-                  <span>Contact Form ({supportEmail})</span>
+                  <span>Contact Form</span>
                 </Link>
               </li>
 
