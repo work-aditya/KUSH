@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star,
   Quote,
@@ -137,7 +138,13 @@ export const ReviewsSection = ({ className = '', id = 'reviews' }) => {
       className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 ${className}`}
     >
       {/* 1. Section Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-3xl mx-auto space-y-4"
+      >
         <Badge variant="accent">Client Transformations & Verified Reviews</Badge>
         <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
           Real People. <span className="text-gradient-gold">Real Transformations.</span>
@@ -190,9 +197,10 @@ export const ReviewsSection = ({ className = '', id = 'reviews' }) => {
         {/* 3. Category Filter Pills */}
         <div className="pt-4 flex flex-wrap justify-center gap-2">
           {CATEGORIES.map((cat) => (
-            <button
+            <motion.button
               key={cat.id}
               type="button"
+              whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 selectedCategory === cat.id
@@ -201,90 +209,104 @@ export const ReviewsSection = ({ className = '', id = 'reviews' }) => {
               }`}
             >
               {cat.label}
-            </button>
+            </motion.button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* 4. Reviews Grid */}
+      {/* 4. Reviews Grid with Fluid AnimatePresence */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-        {filteredReviews.map((rev) => {
-          return (
-            <div
-              key={rev.id}
-              className="glass-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border border-brand-border hover:border-brand-accent/40 shadow-xl transition-all duration-300 hover:-translate-y-1 relative group"
-            >
-              {/* Background ambient corner glow */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 rounded-bl-full pointer-events-none group-hover:bg-brand-accent/10 transition-colors" />
+        <AnimatePresence mode="popLayout">
+          {filteredReviews.map((rev) => {
+            return (
+              <motion.div
+                layout
+                key={rev.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
+                className="glass-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border border-brand-border hover:border-brand-accent/40 shadow-xl relative group cursor-default"
+              >
+                {/* Background ambient corner glow */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 rounded-bl-full pointer-events-none group-hover:bg-brand-accent/10 transition-colors" />
 
-              <div className="space-y-4">
-                {/* Header: Avatar, Name, Location & Stars */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${rev.avatarGradient} flex items-center justify-center text-white font-black text-base shadow-lg shrink-0 relative`}
-                    >
-                      {rev.initials}
-                      {/* Active Online / Verified Dot */}
-                      <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-brand-emerald border-2 border-brand-card" />
+                <div className="space-y-4">
+                  {/* Header: Avatar, Name, Location & Stars */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${rev.avatarGradient} flex items-center justify-center text-white font-black text-base shadow-lg shrink-0 relative`}
+                      >
+                        {rev.initials}
+                        {/* Active Online / Verified Dot */}
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-brand-emerald border-2 border-brand-card" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-base font-bold text-white tracking-tight truncate group-hover:text-brand-accent transition-colors">
+                          {rev.name}
+                        </h4>
+                        <p className="text-xs text-brand-muted flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-brand-accent shrink-0" />
+                          <span>{rev.city}, {rev.country}</span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="text-base font-bold text-white tracking-tight truncate group-hover:text-brand-accent transition-colors">
-                        {rev.name}
-                      </h4>
-                      <p className="text-xs text-brand-muted flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-brand-accent shrink-0" />
-                        <span>{rev.city}, {rev.country}</span>
-                      </p>
+
+                    {/* 5-Star Rating */}
+                    <div className="flex items-center gap-0.5 shrink-0 bg-black/40 px-2 py-1 rounded-lg border border-brand-border/60">
+                      {[...Array(rev.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      ))}
                     </div>
                   </div>
 
-                  {/* 5-Star Rating */}
-                  <div className="flex items-center gap-0.5 shrink-0 bg-black/40 px-2 py-1 rounded-lg border border-brand-border/60">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
+                  {/* Key Result Banner */}
+                  <div
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
+                      rev.highlightType === 'emerald'
+                        ? 'bg-brand-emerald/15 text-brand-emerald border-brand-emerald/30'
+                        : 'bg-brand-accent/15 text-brand-accent border-brand-accent/30'
+                    }`}
+                  >
+                    <Flame className="w-3.5 h-3.5 shrink-0 animate-pulse" />
+                    <span>{rev.highlight}</span>
+                  </div>
+
+                  {/* Testimonial Quote */}
+                  <div className="relative pt-1">
+                    <Quote className="w-6 h-6 text-brand-borderLight/40 absolute -top-1 -left-1 pointer-events-none" />
+                    <p className="text-sm text-brand-muted leading-relaxed relative z-10 pl-2">
+                      "{rev.review}"
+                    </p>
                   </div>
                 </div>
 
-                {/* Key Result Banner */}
-                <div
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                    rev.highlightType === 'emerald'
-                      ? 'bg-brand-emerald/15 text-brand-emerald border-brand-emerald/30'
-                      : 'bg-brand-accent/15 text-brand-accent border-brand-accent/30'
-                  }`}
-                >
-                  <Flame className="w-3.5 h-3.5 shrink-0 animate-pulse" />
-                  <span>{rev.highlight}</span>
+                {/* Card Footer: Program and Verification */}
+                <div className="pt-5 mt-5 border-t border-brand-border/60 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-brand-emerald font-semibold">
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
+                    <span>Verified Trainee</span>
+                  </div>
+                  <span className="text-[11px] text-brand-darkMuted font-medium bg-brand-surface px-2.5 py-1 rounded-lg border border-brand-border">
+                    {rev.program}
+                  </span>
                 </div>
-
-                {/* Testimonial Quote */}
-                <div className="relative pt-1">
-                  <Quote className="w-6 h-6 text-brand-borderLight/40 absolute -top-1 -left-1 pointer-events-none" />
-                  <p className="text-sm text-brand-muted leading-relaxed relative z-10 pl-2">
-                    "{rev.review}"
-                  </p>
-                </div>
-              </div>
-
-              {/* Card Footer: Program and Verification */}
-              <div className="pt-5 mt-5 border-t border-brand-border/60 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-brand-emerald font-semibold">
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span>Verified Trainee</span>
-                </div>
-                <span className="text-[11px] text-brand-darkMuted font-medium bg-brand-surface px-2.5 py-1 rounded-lg border border-brand-border">
-                  {rev.program}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       {/* 5. Bottom WhatsApp Consultation Trigger */}
-      <div className="glass-card rounded-2xl p-6 sm:p-8 border border-brand-border text-center sm:flex sm:items-center sm:justify-between gap-6 max-w-4xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        className="glass-card rounded-2xl p-6 sm:p-8 border border-brand-border text-center sm:flex sm:items-center sm:justify-between gap-6 max-w-4xl mx-auto"
+      >
         <div className="text-left space-y-1 mb-4 sm:mb-0">
           <h4 className="text-lg font-bold text-white flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-brand-accent" />
@@ -296,7 +318,7 @@ export const ReviewsSection = ({ className = '', id = 'reviews' }) => {
         </div>
         <div className="shrink-0 flex items-center gap-3 justify-center">
           <a
-            href="https://wa.me/917042858524?text=Hey%20Kush!%20I%20saw%20the%20client%20reviews%20and%20would%20love%20to%20discuss%20my%20fitness%20transformation"
+            href={`https://wa.me/917042858524?text=${encodeURIComponent('Hi Coach Kush, I saw your client reviews and transformations on coachkush.in and would love to discuss my fitness goals with you.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#25D366] text-white font-bold text-sm shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
@@ -305,7 +327,7 @@ export const ReviewsSection = ({ className = '', id = 'reviews' }) => {
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

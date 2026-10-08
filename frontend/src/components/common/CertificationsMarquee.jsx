@@ -58,8 +58,6 @@ export const CertificationsMarquee = ({
   className = '',
   speed = 'normal', // 'normal' | 'slow' | 'fast'
 }) => {
-  const [isPaused, setIsPaused] = useState(false);
-
   // Duplicate items 4 times to ensure seamless infinite looping on all screen sizes
   const duplicatedCertifications = [
     ...CERTIFICATIONS,
@@ -92,29 +90,6 @@ export const CertificationsMarquee = ({
                 Certified by India’s top fitness academy (K11) and the global gold-standard American Council on Exercise (ACE).
               </p>
             </div>
-
-            {/* Pause / Play interactive toggle button */}
-            <div className="flex items-center justify-center sm:justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsPaused((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-surface/80 hover:bg-brand-surface border border-brand-border text-xs text-brand-muted hover:text-white transition-all shadow-sm"
-                title={isPaused ? 'Resume moving credentials' : 'Pause moving credentials'}
-                aria-label={isPaused ? 'Resume credentials ticker' : 'Pause credentials ticker'}
-              >
-                {isPaused ? (
-                  <>
-                    <Play className="w-3.5 h-3.5 text-brand-emerald fill-brand-emerald" />
-                    <span>Resume Motion</span>
-                  </>
-                ) : (
-                  <>
-                    <Pause className="w-3.5 h-3.5 text-brand-accent" />
-                    <span>Pause Ticker</span>
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -127,23 +102,19 @@ export const CertificationsMarquee = ({
         {/* Right Edge Fade */}
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-36 bg-gradient-to-l from-[#090D14] via-[#090D14]/80 to-transparent z-10" />
 
-        {/* Infinite Moving Side-by-Side Track */}
+        {/* Infinite Moving Side-by-Side Track (Slowed down for relaxed, premium reading) */}
         <div
-          className={`flex gap-4 sm:gap-6 py-2.5 animate-marquee ${
-            isPaused ? '[animation-play-state:paused]' : ''
-          }`}
+          className="flex gap-4 sm:gap-6 py-2.5 animate-marquee"
           style={{
-            animationDuration: speed === 'fast' ? '22s' : speed === 'slow' ? '45s' : '32s',
+            animationDuration: speed === 'fast' ? '45s' : speed === 'slow' ? '85s' : '65s',
           }}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
         >
           {duplicatedCertifications.map((cert, index) => {
             const Icon = cert.icon;
             return (
               <div
                 key={`${cert.id}-${index}`}
-                className="inline-flex items-center gap-3.5 px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl bg-[#0E1628]/95 hover:bg-[#131D33] border border-blue-500/25 hover:border-blue-400/60 shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 group shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-3.5 px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl bg-[#0E1628]/95 hover:bg-[#131D33] border border-blue-500/25 hover:border-blue-400/60 shadow-xl shadow-black/40 backdrop-blur-md transition-all duration-300 group shrink-0 cursor-default"
                 title={`${cert.fullTitle} - ${cert.description}`}
               >
                 {/* Visual Icon in Circular Blue Badge (matching user screenshot) */}
@@ -181,7 +152,7 @@ export const CertificationsMarquee = ({
       {/* Subtle micro text indicator below */}
       <div className="mt-3 text-center">
         <span className="text-[11px] text-brand-darkMuted/80 font-medium tracking-wide">
-          Hover or tap any credential to pause • 100% Scientifically Certified Coaching
+          100% Scientifically Verified & Accredited Coaching Credentials • Premier K11 & ACE Recognition
         </span>
       </div>
     </section>

@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
 import { contactService } from '../services/contactService';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
@@ -57,7 +58,12 @@ export const ContactPage = () => {
         description="Get in touch with Coach Kush for personalized online fitness coaching, virtual training inquiries, or WhatsApp consultation on +91 70428 58524 via coachkush.in."
         canonical="/contact"
       />
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-3xl mx-auto space-y-4"
+      >
         <Badge variant="accent">Get In Touch</Badge>
         <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
           Connect With Coach Kush
@@ -65,25 +71,34 @@ export const ContactPage = () => {
         <p className="text-base sm:text-lg text-brand-muted leading-relaxed">
           Whether you want to discuss fitness goals, clarify live session setups, or inquire about custom plans, reach out anytime.
         </p>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Contact Info & Direct WhatsApp */}
-        <div className="lg:col-span-5 space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-5 space-y-8"
+        >
           <div className="glass-card rounded-3xl p-8 border border-brand-border space-y-6">
             <h2 className="text-xl font-bold text-white">Direct Access</h2>
             <p className="text-sm text-brand-muted leading-relaxed">
               For instant queries or schedule coordination, WhatsApp is the fastest way to connect with Kush directly.
             </p>
 
-            <WhatsAppButton text="Chat with Kush on WhatsApp" className="w-full" />
+            <WhatsAppButton
+              text="Chat with Kush on WhatsApp"
+              message="Hi Coach Kush, I am reaching out through your contact page on coachkush.in to inquire about your personal training and nutrition coaching programs."
+              className="w-full"
+            />
 
             <div className="pt-6 border-t border-brand-border/60 space-y-4">
               <a
-                href="https://wa.me/917042858524"
+                href={`https://wa.me/917042858524?text=${encodeURIComponent('Hi Coach Kush, I am reaching out through your contact page on coachkush.in to inquire about your personal training and nutrition coaching programs.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-4 group cursor-pointer"
+                className="flex items-start gap-4 group cursor-pointer transition-transform duration-200 hover:translate-x-1"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] shrink-0 group-hover:bg-[#25D366]/25 transition-colors">
                   <MessageCircle className="w-5 h-5" />
@@ -96,7 +111,7 @@ export const ContactPage = () => {
                 </div>
               </a>
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 transition-transform duration-200 hover:translate-x-1">
                 <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-brand-accent shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
@@ -106,7 +121,7 @@ export const ContactPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 transition-transform duration-200 hover:translate-x-1">
                 <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-brand-emerald shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
@@ -116,7 +131,7 @@ export const ContactPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 transition-transform duration-200 hover:translate-x-1">
                 <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-brand-accent shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
@@ -127,10 +142,15 @@ export const ContactPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Contact Form */}
-        <div className="lg:col-span-7">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-7"
+        >
           <div className="glass-card rounded-3xl p-8 sm:p-10 border border-brand-border">
             <h2 className="text-2xl font-bold text-white mb-2">Send an Inquiry</h2>
             <p className="text-xs sm:text-sm text-brand-muted mb-6">
@@ -215,7 +235,7 @@ export const ContactPage = () => {
               </Button>
             </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

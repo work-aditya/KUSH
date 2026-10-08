@@ -8,6 +8,7 @@ export const WhatsAppButton = ({
   className,
   url,
   text = 'Chat with Kush on WhatsApp',
+  message = 'Hi Coach Kush, I was exploring your website coachkush.in and would like to know more about your online fitness coaching programs.',
   variant = 'default', // 'default', 'floating', 'compact'
 }) => {
   const { data: settings } = useQuery({
@@ -16,11 +17,24 @@ export const WhatsAppButton = ({
     staleTime: 60 * 1000,
   });
 
-  const whatsappUrl =
-    url ||
-    settings?.whatsapp_url ||
-    import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
-    'https://wa.me/917042858524';
+  const getWhatsappUrl = () => {
+    if (url) {
+      if (url.includes('?text=') || !message) return url;
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}text=${encodeURIComponent(message)}`;
+    }
+
+    const rawUrl =
+      settings?.whatsapp_url ||
+      import.meta.env.VITE_WHATSAPP_CONTACT_URL ||
+      'https://wa.me/917042858524';
+
+    if (rawUrl.includes('?text=')) return rawUrl;
+    const cleanUrl = rawUrl.split('?')[0];
+    return `${cleanUrl}?text=${encodeURIComponent(message)}`;
+  };
+
+  const whatsappUrl = getWhatsappUrl();
 
   if (variant === 'floating') {
     return (

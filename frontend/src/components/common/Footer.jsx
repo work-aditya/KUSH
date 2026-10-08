@@ -20,8 +20,9 @@ export const Footer = () => {
     staleTime: 60 * 1000,
   });
 
-  // Footer WhatsApp URL with prefilled query: "Hey! can i get more information on this"
-  const footerWhatsappMessage = 'Hey! can i get more information on this';
+  // Footer WhatsApp URL with prefilled query
+  const footerWhatsappMessage =
+    'Hi Coach Kush, I was exploring your website coachkush.in and would like more information on your live fitness coaching packages.';
   const whatsappUrl = `https://wa.me/917042858524?text=${encodeURIComponent(footerWhatsappMessage)}`;
   const whatsappNumber = settings?.whatsapp_number || '+91 70428 58524';
   const instagramUrl = settings?.instagram_url || 'https://instagram.com/coachhkush';

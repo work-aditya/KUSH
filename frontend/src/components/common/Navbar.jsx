@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from './Button';
 import { Menu, X, Shield, User, LogOut, ChevronDown, Dumbbell, MessageCircle } from 'lucide-react';
@@ -23,6 +24,10 @@ export const Navbar = () => {
     { name: 'FAQ', path: '/faq' },
     { name: 'Contact', path: '/contact' },
   ];
+
+  const navbarWhatsappUrl =
+    'https://wa.me/917042858524?text=' +
+    encodeURIComponent('Hi Coach Kush, I was visiting your website coachkush.in and would like to ask a few questions about your live fitness coaching.');
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-brand-border bg-brand-bg/85 backdrop-blur-md">
@@ -73,7 +78,7 @@ export const Navbar = () => {
         {/* Auth / Action CTA */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="https://wa.me/917042858524"
+            href={navbarWhatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 text-xs font-semibold transition-all duration-200"
@@ -96,33 +101,41 @@ export const Navbar = () => {
                 <ChevronDown className="w-4 h-4 text-brand-muted" />
               </button>
 
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-4 py-2 border-b border-brand-border">
-                    <p className="text-xs text-brand-muted">Signed in as</p>
-                    <p className="text-sm font-semibold text-white truncate">{user?.email}</p>
-                  </div>
-
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-brand-accent hover:bg-brand-surface transition-colors"
-                    >
-                      <Shield className="w-4 h-4" />
-                      Admin Dashboard
-                    </Link>
-                  )}
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-brand-surface transition-colors text-left"
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    className="absolute right-0 mt-2 w-52 bg-brand-card border border-brand-border rounded-xl shadow-2xl py-2 z-50"
                   >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
-                </div>
-              )}
+                    <div className="px-4 py-2 border-b border-brand-border">
+                      <p className="text-xs text-brand-muted">Signed in as</p>
+                      <p className="text-sm font-semibold text-white truncate">{user?.email}</p>
+                    </div>
+
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-brand-accent hover:bg-brand-surface transition-colors"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Admin Dashboard
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-brand-surface transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <div className="flex items-center gap-3">
@@ -143,7 +156,7 @@ export const Navbar = () => {
         {/* Mobile Hamburger Toggle */}
         <div className="flex md:hidden items-center gap-3">
           <a
-            href="https://wa.me/917042858524"
+            href={navbarWhatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 text-xs font-semibold"
@@ -162,70 +175,78 @@ export const Navbar = () => {
       </div>
 
       {/* Mobile Drawer */}
-      {mobileOpen && (
-        <div className="md:hidden border-b border-brand-border bg-brand-card/95 backdrop-blur-xl px-4 pt-4 pb-6 space-y-3">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setMobileOpen(false)}
-              className="block py-2.5 px-3 text-base font-medium rounded-lg text-brand-muted hover:text-white hover:bg-brand-surface"
-            >
-              {link.name}
-            </Link>
-          ))}
-
-          {isAdmin && (
-            <Link
-              to="/admin"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2 py-2.5 px-3 text-base font-semibold text-brand-accent bg-brand-accent/10 rounded-lg"
-            >
-              <Shield className="w-5 h-5" />
-              Admin Portal
-            </Link>
-          )}
-
-          <a
-            href="https://wa.me/917042858524"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileOpen(false)}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold rounded-lg bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 hover:bg-[#25D366]/25 transition-colors"
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden border-b border-brand-border bg-brand-card/95 backdrop-blur-xl px-4 pt-4 pb-6 space-y-3 overflow-hidden"
           >
-            <MessageCircle className="w-4 h-4 fill-current" />
-            Chat on WhatsApp (+91 70428 58524)
-          </a>
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileOpen(false)}
+                className="block py-2.5 px-3 text-base font-medium rounded-lg text-brand-muted hover:text-white hover:bg-brand-surface"
+              >
+                {link.name}
+              </Link>
+            ))}
 
-          <div className="pt-4 border-t border-brand-border flex flex-col gap-2.5">
-            {isAuthenticated ? (
-              <>
-                <div className="px-3 py-2">
-                  <p className="text-xs text-brand-muted">Signed in as</p>
-                  <p className="text-sm font-semibold text-white truncate">{user?.name} ({user?.email})</p>
-                </div>
-                <Button variant="danger" size="md" onClick={handleLogout} className="w-full">
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <Link to="/login" onClick={() => setMobileOpen(false)}>
-                  <Button variant="secondary" size="md" className="w-full">
-                    Log In
-                  </Button>
-                </Link>
-                <Link to="/register" onClick={() => setMobileOpen(false)}>
-                  <Button variant="primary" size="md" className="w-full">
-                    Sign Up
-                  </Button>
-                </Link>
-              </div>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 py-2.5 px-3 text-base font-semibold text-brand-accent bg-brand-accent/10 rounded-lg"
+              >
+                <Shield className="w-5 h-5" />
+                Admin Portal
+              </Link>
             )}
-          </div>
-        </div>
-      )}
+
+            <a
+              href={navbarWhatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center gap-2 py-2.5 px-3 text-sm font-semibold rounded-lg bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 hover:bg-[#25D366]/25 transition-colors"
+            >
+              <MessageCircle className="w-4 h-4 fill-current" />
+              Chat on WhatsApp (+91 70428 58524)
+            </a>
+
+            <div className="pt-4 border-t border-brand-border flex flex-col gap-2.5">
+              {isAuthenticated ? (
+                <>
+                  <div className="px-3 py-2">
+                    <p className="text-xs text-brand-muted">Signed in as</p>
+                    <p className="text-sm font-semibold text-white truncate">{user?.name} ({user?.email})</p>
+                  </div>
+                  <Button variant="danger" size="md" onClick={handleLogout} className="w-full">
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Link to="/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="secondary" size="md" className="w-full">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setMobileOpen(false)}>
+                    <Button variant="primary" size="md" className="w-full">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

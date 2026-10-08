@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { productService } from '../services/productService';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/common/Button';
@@ -67,7 +68,12 @@ export const PricingPage = () => {
         canonical="/pricing"
       />
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-3xl mx-auto space-y-4"
+      >
         <Badge variant="accent">Official Coaching Memberships</Badge>
         <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
           Online Fitness Coaching Plans & Pricing
@@ -79,7 +85,8 @@ export const PricingPage = () => {
         {/* Filter Tabs */}
         <div className="pt-6 flex justify-center">
           <div className="inline-flex p-1.5 rounded-xl bg-brand-card border border-brand-border gap-1">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.96 }}
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                 filter === 'all'
@@ -88,8 +95,9 @@ export const PricingPage = () => {
               }`}
             >
               All Programs ({plans.length})
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
               onClick={() => setFilter('single')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                 filter === 'single'
@@ -99,8 +107,9 @@ export const PricingPage = () => {
             >
               <User className="w-3.5 h-3.5" />
               1-on-1 Single
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
               onClick={() => setFilter('couple')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                 filter === 'couple'
@@ -110,10 +119,10 @@ export const PricingPage = () => {
             >
               <Users className="w-3.5 h-3.5" />
               Couple / Partner
-            </button>
+            </motion.button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Admin-Only Live Payment Verification Card (₹5 INR) */}
       {isAdmin && (
@@ -199,104 +208,118 @@ export const PricingPage = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPlans.map((plan) => {
-            const isCouple = plan.planType === 'couple';
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode="popLayout">
+            {filteredPlans.map((plan) => {
+              const isCouple = plan.planType === 'couple';
 
-            return (
-              <div
-                key={plan.id || plan._id}
-                className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-all duration-300 relative ${
-                  isCouple
-                    ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5'
-                    : 'border-brand-border hover:border-brand-accent/60 shadow-xl'
-                }`}
-              >
-                {/* Plan Badge */}
-                <div className="flex justify-between items-start mb-4">
-                  <Badge variant={isCouple ? 'emerald' : 'accent'}>
-                    {isCouple
-                      ? 'Couple / Partner'
-                      : plan.slug === 'diet-plan'
-                      ? 'Diet & Nutrition'
-                      : plan.slug === 'custom-workout-plan'
-                      ? 'Custom Training'
-                      : '1-on-1 Single'}
-                  </Badge>
-                  <span className="text-xs font-semibold text-brand-muted flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {plan.duration}
-                  </span>
-                </div>
-
-                {/* Plan Info */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-extrabold text-white">{plan.title}</h3>
-                    <p className="text-xs font-medium text-brand-accent mt-0.5">
-                      {plan.slug === 'diet-plan'
-                        ? 'Customized Nutrition Plan'
+              return (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -6 }}
+                  key={plan.id || plan._id}
+                  className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-colors duration-300 relative ${
+                    isCouple
+                      ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5'
+                      : 'border-brand-border hover:border-brand-accent/60 shadow-xl'
+                  }`}
+                >
+                  {/* Plan Badge */}
+                  <div className="flex justify-between items-start mb-4">
+                    <Badge variant={isCouple ? 'emerald' : 'accent'}>
+                      {isCouple
+                        ? 'Couple / Partner'
+                        : plan.slug === 'diet-plan'
+                        ? 'Diet & Nutrition'
                         : plan.slug === 'custom-workout-plan'
-                        ? 'Tailored Workout Structure'
-                        : `${plan.sessions} Live Interactive Sessions`}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 flex items-baseline gap-1.5">
-                    <span className="text-3xl sm:text-4xl font-black text-white">
-                      {formatINR(plan.price)}
+                        ? 'Custom Training'
+                        : '1-on-1 Single'}
+                    </Badge>
+                    <span className="text-xs font-semibold text-brand-muted flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {plan.duration}
                     </span>
-                    <span className="text-xs font-semibold text-brand-muted">/ {plan.duration}</span>
                   </div>
 
-                  <p className="text-xs text-brand-muted leading-relaxed min-h-[36px]">
-                    {plan.description}
-                  </p>
+                  {/* Plan Info */}
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xl font-extrabold text-white">{plan.title}</h3>
+                      <p className="text-xs font-medium text-brand-accent mt-0.5">
+                        {plan.slug === 'diet-plan'
+                          ? 'Customized Nutrition Plan'
+                          : plan.slug === 'custom-workout-plan'
+                          ? 'Tailored Workout Structure'
+                          : `${plan.sessions} Live Interactive Sessions`}
+                      </p>
+                    </div>
 
-                  {/* Features List */}
-                  <div className="pt-4 border-t border-brand-border/60 space-y-2.5">
-                    <p className="text-[11px] font-bold text-white uppercase tracking-wider">
-                      Included in this program:
+                    <div className="pt-2 flex items-baseline gap-1.5">
+                      <span className="text-3xl sm:text-4xl font-black text-white">
+                        {formatINR(plan.price)}
+                      </span>
+                      <span className="text-xs font-semibold text-brand-muted">/ {plan.duration}</span>
+                    </div>
+
+                    <p className="text-xs text-brand-muted leading-relaxed min-h-[36px]">
+                      {plan.description}
                     </p>
-                    <ul className="space-y-2 text-xs text-brand-muted">
-                      {plan.features?.map((feat, idx) => (
-                        <li key={idx} className="flex items-start gap-2.5">
-                          <CheckCircle
-                            className={`w-4 h-4 shrink-0 mt-0.5 ${
-                              isCouple ? 'text-brand-emerald' : 'text-brand-accent'
-                            }`}
-                          />
-                          <span className="leading-snug">{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
 
-                {/* Buy Action */}
-                <div className="pt-8 mt-auto">
-                  <Button
-                    variant={isCouple ? 'emerald' : 'primary'}
-                    size="lg"
-                    className="w-full text-sm font-bold uppercase tracking-wider gap-2 shadow-xl"
-                    onClick={() => handleCheckout(plan)}
-                  >
-                    Get Started
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                  <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-brand-emerald" />
-                    Secured Payments • Instant Tax Invoice
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    {/* Features List */}
+                    <div className="pt-4 border-t border-brand-border/60 space-y-2.5">
+                      <p className="text-[11px] font-bold text-white uppercase tracking-wider">
+                        Included in this program:
+                      </p>
+                      <ul className="space-y-2 text-xs text-brand-muted">
+                        {plan.features?.map((feat, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <CheckCircle
+                              className={`w-4 h-4 shrink-0 mt-0.5 ${
+                                isCouple ? 'text-brand-emerald' : 'text-brand-accent'
+                              }`}
+                            />
+                            <span className="leading-snug">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Buy Action */}
+                  <div className="pt-8 mt-auto">
+                    <Button
+                      variant={isCouple ? 'emerald' : 'primary'}
+                      size="lg"
+                      className="w-full text-sm font-bold uppercase tracking-wider gap-2 shadow-xl"
+                      onClick={() => handleCheckout(plan)}
+                    >
+                      Get Started
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                    <p className="text-[10px] text-center text-brand-darkMuted mt-2 flex items-center justify-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-brand-emerald" />
+                      Secured Payments • Instant Tax Invoice
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Guarantee & Contact note */}
-      <div className="glass-card rounded-2xl p-8 border border-brand-border flex flex-col md:flex-row items-center justify-between gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        className="glass-card rounded-2xl p-8 border border-brand-border flex flex-col md:flex-row items-center justify-between gap-6"
+      >
         <div className="space-y-1 text-center md:text-left">
           <h3 className="text-lg font-bold text-white flex items-center justify-center md:justify-start gap-2">
             <Video className="w-5 h-5 text-brand-accent" />
@@ -306,8 +329,11 @@ export const PricingPage = () => {
             Kush is available directly on WhatsApp to review your goals before you enroll.
           </p>
         </div>
-        <WhatsAppButton text="Chat with Kush on WhatsApp" />
-      </div>
+        <WhatsAppButton
+          text="Chat with Kush on WhatsApp"
+          message="Hi Coach Kush, I have a few questions about your training packages and schedule before booking a coaching membership."
+        />
+      </motion.div>
 
       {/* Interactive FAQ Section */}
       <FAQSection className="pt-8 border-t border-brand-border/60" />

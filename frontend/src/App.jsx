@@ -4,6 +4,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { ProtectedRoute } from './components/protected/ProtectedRoute';
 import { AdminRoute } from './components/protected/AdminRoute';
+import { ScrollToTop } from './components/common/ScrollToTop';
 import { triggerOrganicHeartbeat } from './services/heartbeatService';
 
 // Public Pages
@@ -41,6 +42,7 @@ export function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public Trainee Routes */}
         <Route path="/" element={<MainLayout />}>

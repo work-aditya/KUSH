@@ -24,7 +24,7 @@ import {
   HeartPulse,
   Radio,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FAQSection } from '../components/common/FAQSection';
 import { SEO } from '../components/common/SEO';
 import { CertificationsMarquee } from '../components/common/CertificationsMarquee';
@@ -202,17 +202,40 @@ export const HomePage = () => {
       />
       {/* 1. HERO SECTION WITH COACH KUSH VISUAL */}
       <section className="relative pt-8 sm:pt-14 lg:pt-18">
-        {/* Background Atmosphere Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-brand-accent/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[500px] h-[300px] bg-brand-emerald/10 rounded-full blur-[140px] pointer-events-none" />
+        {/* Background Atmosphere Glows with subtle ambient breathing motion */}
+        <motion.div
+          animate={{
+            scale: [1, 1.08, 1],
+            opacity: [0.1, 0.16, 0.1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-brand-accent/10 rounded-full blur-[150px] pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.06, 1],
+            opacity: [0.08, 0.15, 0.08],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1.5,
+          }}
+          className="absolute top-1/3 right-10 w-[500px] h-[300px] bg-brand-emerald/10 rounded-full blur-[140px] pointer-events-none"
+        />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* Left: Headlines & CTAs */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-7 space-y-6 text-center lg:text-left"
             >
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-brand-card/90 border border-brand-border shadow-lg">
@@ -239,7 +262,10 @@ export const HomePage = () => {
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
-                <WhatsAppButton text="Chat with Kush on WhatsApp" />
+                <WhatsAppButton
+                  text="Chat with Kush on WhatsApp"
+                  message="Hi Coach Kush, I was exploring your website coachkush.in and would like to learn more about your live 1-on-1 virtual training sessions."
+                />
               </div>
 
               {/* Key Trust Stats */}
@@ -261,9 +287,9 @@ export const HomePage = () => {
 
             {/* Right: Coach Kush Visual Card */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, y: 45 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 flex justify-center"
             >
               <div className="relative w-full max-w-md group">
@@ -312,7 +338,13 @@ export const HomePage = () => {
       <CertificationsMarquee />
 
       {/* 2. COACH INTRODUCTION & PHILOSOPHY */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-70px' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="glass-card rounded-3xl p-8 sm:p-12 lg:p-16 border border-brand-border relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-7 space-y-6">
@@ -333,25 +365,34 @@ export const HomePage = () => {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-surface border border-brand-border">
+                <motion.div
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-brand-surface border border-brand-border"
+                >
                   <Flame className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-sm font-semibold text-white">Real-Time Form Cues</h4>
                     <p className="text-xs text-brand-muted mt-0.5">Instant verbal corrections to prevent injury and maximize tension.</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-brand-surface border border-brand-border">
+                </motion.div>
+                <motion.div
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-brand-surface border border-brand-border"
+                >
                   <Award className="w-5 h-5 text-brand-emerald shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-sm font-semibold text-white">Systematic Progression</h4>
                     <p className="text-xs text-brand-muted mt-0.5">Weekly tracking of weights, sets, and body composition changes.</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
 
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full rounded-2xl overflow-hidden glass-card border border-brand-border p-3 shadow-2xl">
+              <motion.div
+                whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                className="relative w-full rounded-2xl overflow-hidden glass-card border border-brand-border p-3 shadow-2xl"
+              >
                 <img
                   src="/assets/images/virtual_session.jpg"
                   alt="Live 1-on-1 virtual fitness coaching session with Coach Kush"
@@ -371,15 +412,21 @@ export const HomePage = () => {
                     Set up your phone or laptop anywhere: home, apartment gym, or commercial gym. Kush guides your entire workout live.
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* 3. DYNAMIC PRICING CARDS SECTION (FULL CARD DISPLAY) */}
       <section id="pricing-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mx-auto space-y-4 mb-12"
+        >
           <Badge variant="accent">Membership & Pricing</Badge>
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
             Choose Your Transformation Package
@@ -425,22 +472,29 @@ export const HomePage = () => {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {filteredPlans.map((plan) => {
-            const isCouple = plan.planType === 'couple';
+          <AnimatePresence mode="popLayout">
+            {filteredPlans.map((plan, idx) => {
+              const isCouple = plan.planType === 'couple';
 
-            return (
-              <div
-                key={plan.id || plan._id}
-                className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-all duration-300 relative ${
-                  isCouple
-                    ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5 hover:-translate-y-1'
-                    : 'border-brand-border hover:border-brand-accent/60 shadow-xl hover:-translate-y-1'
-                }`}
-              >
+              return (
+                <motion.div
+                  layout
+                  key={plan.id || plan._id}
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.45, delay: idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' } }}
+                  className={`glass-card rounded-3xl p-7 flex flex-col justify-between border transition-colors duration-300 relative ${
+                    isCouple
+                      ? 'border-brand-emerald/40 hover:border-brand-emerald shadow-xl shadow-brand-emerald/5'
+                      : 'border-brand-border hover:border-brand-accent/60 shadow-xl'
+                  }`}
+                >
                 {/* Header Badge */}
                 <div className="flex justify-between items-start mb-4">
                   <Badge variant={isCouple ? 'emerald' : 'accent'}>
@@ -518,9 +572,10 @@ export const HomePage = () => {
                     Secured Payments • Instant Tax Invoice
                   </p>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
 
         <div className="mt-12 text-center">
@@ -534,11 +589,20 @@ export const HomePage = () => {
       </section>
 
       {/* 4. PARTNER & COUPLE COACHING SPOTLIGHT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-70px' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="glass-card rounded-3xl p-8 sm:p-12 lg:p-16 border border-brand-emerald/30 relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-5 order-2 lg:order-1">
-              <div className="rounded-2xl overflow-hidden shadow-2xl border border-brand-border">
+              <motion.div
+                whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                className="rounded-2xl overflow-hidden shadow-2xl border border-brand-border"
+              >
                 <img
                   src="/assets/images/couple_workout.jpg"
                   alt="Couple and partner virtual fitness coaching with Coach Kush"
@@ -546,7 +610,7 @@ export const HomePage = () => {
                   height="320"
                   className="w-full h-80 object-cover object-top filter contrast-[1.05]"
                 />
-              </div>
+              </motion.div>
             </div>
 
             <div className="lg:col-span-7 space-y-6 order-1 lg:order-2">
@@ -578,12 +642,15 @@ export const HomePage = () => {
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
-                <WhatsAppButton text="Ask Kush About Couple Training" />
+                <WhatsAppButton
+                  text="Ask Kush About Couple Training"
+                  message="Hi Coach Kush, my partner and I are interested in your Couple / Partner virtual training sessions. Could you share available slots and package details?"
+                />
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* 5. VERIFIED CLIENT TRANSFORMATIONS & REVIEWS */}
       <ReviewsSection className="pt-4 sm:pt-8" />
@@ -591,8 +658,14 @@ export const HomePage = () => {
       {/* 6. INTERACTIVE FAQ SECTION */}
       <FAQSection className="my-16 border-t border-brand-border/60 pt-16" />
 
-      {/* 6. CALL TO ACTION SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 7. CALL TO ACTION SECTION */}
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-brand-card via-brand-surface to-[#0D1524] border border-brand-border p-8 sm:p-16 text-center shadow-2xl">
           <div className="relative z-10 max-w-3xl mx-auto space-y-6">
             <Badge variant="accent">Start Your Transformation</Badge>
@@ -609,11 +682,14 @@ export const HomePage = () => {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <WhatsAppButton text="Message Kush on WhatsApp" />
+              <WhatsAppButton
+                text="Message Kush on WhatsApp"
+                message="Hi Coach Kush, I would like to consult with you about starting a personalized fitness and nutrition program."
+              />
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

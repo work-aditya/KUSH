@@ -94,7 +94,13 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
   return (
     <section className={`max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 ${className}`}>
       {/* Section Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-3">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-2xl mx-auto space-y-3"
+      >
         <Badge variant="accent">Got Questions? We Have Answers</Badge>
         {asH1 ? (
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -108,7 +114,7 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
         <p className="text-sm text-brand-muted leading-relaxed">
           {subtitle}
         </p>
-      </div>
+      </motion.div>
 
       {/* Category Pills */}
       <div className="flex flex-wrap justify-center gap-2">
@@ -117,7 +123,8 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
           const isActive = activeCategory === cat.id;
 
           return (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.96 }}
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
@@ -128,25 +135,31 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
             >
               <Icon className="w-3.5 h-3.5" />
               {cat.label}
-            </button>
+            </motion.button>
           );
         })}
       </div>
 
       {/* Accordion Questions */}
-      <div className="space-y-3">
-        {filteredFaqs.map((faq) => {
-          const isOpen = openId === faq.id;
+      <motion.div layout className="space-y-3">
+        <AnimatePresence mode="popLayout">
+          {filteredFaqs.map((faq) => {
+            const isOpen = openId === faq.id;
 
-          return (
-            <div
-              key={faq.id}
-              className={`glass-card rounded-2xl border transition-all duration-200 overflow-hidden ${
-                isOpen
-                  ? 'border-brand-accent/50 bg-brand-surface/70 shadow-lg shadow-black/40'
-                  : 'border-brand-border hover:border-brand-borderLight bg-brand-card/60'
-              }`}
-            >
+            return (
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                key={faq.id}
+                className={`glass-card rounded-2xl border transition-colors duration-200 overflow-hidden ${
+                  isOpen
+                    ? 'border-brand-accent/50 bg-brand-surface/70 shadow-lg shadow-black/40'
+                    : 'border-brand-border hover:border-brand-borderLight bg-brand-card/60'
+                }`}
+              >
               <button
                 onClick={() => toggleAccordion(faq.id)}
                 className="w-full text-left p-5 sm:p-6 flex items-center justify-between gap-4 transition-colors"
@@ -180,10 +193,11 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </AnimatePresence>
+    </motion.div>
 
       {/* WhatsApp Help Callout */}
       <div className="glass-card rounded-2xl p-6 border border-brand-border flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
@@ -199,7 +213,7 @@ export const FAQSection = ({ className = '', title = 'Frequently Asked Questions
           </div>
         </div>
         <a
-          href="https://wa.me/917042858524"
+          href={`https://wa.me/917042858524?text=${encodeURIComponent('Hi Coach Kush, I was reviewing your FAQs on coachkush.in and have a specific question about your training programs before enrolling.')}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-emerald text-black text-xs font-bold hover:bg-emerald-400 transition-colors shrink-0 shadow-lg shadow-brand-emerald/20"

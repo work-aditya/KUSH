@@ -12,7 +12,10 @@ export const MainLayout = () => {
 
   useEffect(() => {
     syncDomainMetadata(location.pathname);
-  }, [location.pathname]);
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
   return (
     <div className="min-h-screen flex flex-col bg-brand-bg text-brand-text">
       <Navbar />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
@@ -30,7 +31,12 @@ export const AboutPage = () => {
         canonical="/about"
       />
       {/* 1. Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.div
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center max-w-3xl mx-auto space-y-4"
+      >
         <Badge variant="accent">The Coach Behind Your Results</Badge>
         <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight">
           About Coach Kush
@@ -40,14 +46,19 @@ export const AboutPage = () => {
         </p>
 
         {/* Coach Kush Portrait Banner */}
-        <div className="pt-4 max-w-2xl mx-auto">
-          <div className="rounded-3xl overflow-hidden glass-card border border-brand-border shadow-2xl relative">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="pt-4 max-w-2xl mx-auto"
+        >
+          <div className="rounded-3xl overflow-hidden glass-card border border-brand-border shadow-2xl relative transition-all duration-300 hover:border-brand-accent/40 group">
             <img
               src="/assets/images/coach_kush.jpg"
               alt="Coach Kush - Certified Gym Trainer and Online Fitness Coach"
               width="600"
               height="450"
-              className="w-full h-80 sm:h-96 object-cover object-top filter brightness-[0.95] contrast-[1.05]"
+              className="w-full h-80 sm:h-96 object-cover object-top filter brightness-[0.95] contrast-[1.05] group-hover:scale-[1.02] transition-transform duration-500 ease-out"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-transparent flex items-end p-6">
               <div className="flex justify-between items-center w-full">
@@ -61,14 +72,20 @@ export const AboutPage = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Moving Side-by-Side Credentials Marquee */}
       <CertificationsMarquee showHeader={true} />
 
       {/* 2. Coach Philosophy */}
-      <div className="glass-card rounded-3xl p-8 sm:p-14 border border-brand-border grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="glass-card rounded-3xl p-8 sm:p-14 border border-brand-border grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+      >
         <div className="space-y-6">
           <Badge variant="emerald">Coaching Philosophy</Badge>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
@@ -81,12 +98,19 @@ export const AboutPage = () => {
             My philosophy centers on <strong>interactive accountability</strong>. In our sessions, I am with you on screen for every rep, coaching tempo, adjusting range of motion, and celebrating breakthroughs.
           </p>
           <div className="pt-2">
-            <WhatsAppButton text="Chat with Kush on WhatsApp" />
+            <WhatsAppButton
+              text="Chat with Kush on WhatsApp"
+              message="Hi Coach Kush, I was reading about your coaching philosophy on coachkush.in and would love to discuss my fitness goals with you."
+            />
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2 hover:border-brand-accent/40 transition-colors"
+          >
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Flame className="w-5 h-5 text-brand-accent" />
               1. Biomechanics Over Ego
@@ -94,9 +118,13 @@ export const AboutPage = () => {
             <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
               We prioritize joint health and targeted muscle activation so you stay injury-free and progress for decades.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2 hover:border-brand-emerald/40 transition-colors"
+          >
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <HeartPulse className="w-5 h-5 text-brand-emerald" />
               2. Sustainable Nutrition
@@ -104,9 +132,13 @@ export const AboutPage = () => {
             <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
               No starvation diets. We build realistic caloric and macro guidelines tailored to your cultural foods and lifestyle.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2">
+          <motion.div
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2 }}
+            className="p-6 rounded-2xl bg-brand-surface border border-brand-border space-y-2 hover:border-brand-accent/40 transition-colors"
+          >
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Target className="w-5 h-5 text-brand-accent" />
               3. Relentless Accountability
@@ -114,22 +146,35 @@ export const AboutPage = () => {
             <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
               Scheduled calendar slots and direct WhatsApp check-ins ensure you never miss a workout or fall off track.
             </p>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* 3. Methodology */}
       <div className="space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-2xl mx-auto space-y-3"
+        >
           <Badge variant="accent">Online Methodology</Badge>
           <h2 className="text-3xl font-extrabold text-white">How We Train Online</h2>
           <p className="text-sm text-brand-muted">
             High definition video, audio cues, and instant schedule synchronization.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="glass-card rounded-2xl p-8 space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.5, delay: 0, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ y: -5 }}
+            className="glass-card rounded-2xl p-8 space-y-4 border border-brand-border hover:border-brand-accent/40 transition-all duration-300"
+          >
             <div className="w-10 h-10 rounded-xl bg-brand-accent/15 text-brand-accent flex items-center justify-center font-bold text-lg">
               01
             </div>
@@ -137,9 +182,16 @@ export const AboutPage = () => {
             <p className="text-sm text-brand-muted leading-relaxed">
               We begin with an in-depth consultation reviewing your history, injuries, goals, and setup (whether home dumbbells or a commercial gym).
             </p>
-          </div>
+          </motion.div>
 
-          <div className="glass-card rounded-2xl p-8 space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ y: -5 }}
+            className="glass-card rounded-2xl p-8 space-y-4 border border-brand-border hover:border-brand-emerald/40 transition-all duration-300"
+          >
             <div className="w-10 h-10 rounded-xl bg-brand-emerald/15 text-brand-emerald flex items-center justify-center font-bold text-lg">
               02
             </div>
@@ -147,9 +199,16 @@ export const AboutPage = () => {
             <p className="text-sm text-brand-muted leading-relaxed">
               Each session is 50-60 minutes of focused lifting. Kush is on video watching every angle, cueing breathing, and timing recovery intervals.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="glass-card rounded-2xl p-8 space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ y: -5 }}
+            className="glass-card rounded-2xl p-8 space-y-4 border border-brand-border hover:border-brand-accent/40 transition-all duration-300"
+          >
             <div className="w-10 h-10 rounded-xl bg-brand-accent/15 text-brand-accent flex items-center justify-center font-bold text-lg">
               03
             </div>
@@ -157,13 +216,19 @@ export const AboutPage = () => {
             <p className="text-sm text-brand-muted leading-relaxed">
               We log weights and reps across each mesocycle, adjusting nutrition targets and recovery protocols as your body adapts.
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* 3.5. ACCREDITED CERTIFICATIONS DETAIL SECTION */}
       <section className="space-y-10">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-2xl mx-auto space-y-3"
+        >
           <Badge variant="accent">Professional Qualifications</Badge>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Accredited Certifications & Academic Credentials
@@ -171,15 +236,20 @@ export const AboutPage = () => {
           <p className="text-sm text-brand-muted leading-relaxed">
             Every fitness protocol prescribed by Coach Kush is anchored in exercise science, functional anatomy, and evidence-based nutrition.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {CERTIFICATIONS.map((cert) => {
+          {CERTIFICATIONS.map((cert, idx) => {
             const Icon = cert.icon;
             return (
-              <div
+              <motion.div
                 key={cert.id}
-                className="glass-card rounded-3xl p-6 sm:p-8 border border-blue-500/20 hover:border-blue-400/50 shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: (idx % 2) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -5 }}
+                className="glass-card rounded-3xl p-6 sm:p-8 border border-blue-500/20 hover:border-blue-400/50 shadow-xl transition-all duration-300 group"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-300">
@@ -205,7 +275,7 @@ export const AboutPage = () => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -215,7 +285,13 @@ export const AboutPage = () => {
       <ReviewsSection className="pt-4" />
 
       {/* 5. CTA */}
-      <div className="glass-card rounded-3xl p-10 text-center border border-brand-accent/30 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="glass-card rounded-3xl p-10 text-center border border-brand-accent/30 relative overflow-hidden"
+      >
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-3xl font-extrabold text-white">Transform With Kush Today</h2>
           <p className="text-sm text-brand-muted">
@@ -228,10 +304,14 @@ export const AboutPage = () => {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-            <WhatsAppButton text="Chat on WhatsApp" />
+            <WhatsAppButton
+              text="Chat on WhatsApp"
+              message="Hi Coach Kush, I want to begin my transformation journey with your live coaching. Can we discuss which package is best for my goals?"
+            />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
+
