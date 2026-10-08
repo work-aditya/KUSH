@@ -28,6 +28,7 @@ import { motion } from 'framer-motion';
 import { FAQSection } from '../components/common/FAQSection';
 import { SEO } from '../components/common/SEO';
 import { CertificationsMarquee } from '../components/common/CertificationsMarquee';
+import { ReviewsSection } from '../components/common/ReviewsSection';
 
 const DEFAULT_PLANS = [
   {
@@ -584,7 +585,10 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. INTERACTIVE FAQ SECTION */}
+      {/* 5. VERIFIED CLIENT TRANSFORMATIONS & REVIEWS */}
+      <ReviewsSection className="pt-4 sm:pt-8" />
+
+      {/* 6. INTERACTIVE FAQ SECTION */}
       <FAQSection className="my-16 border-t border-brand-border/60 pt-16" />
 
       {/* 6. CALL TO ACTION SECTION */}

@@ -5,6 +5,7 @@ import { Button } from '../components/common/Button';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { SEO } from '../components/common/SEO';
 import { CertificationsMarquee, CERTIFICATIONS } from '../components/common/CertificationsMarquee';
+import { ReviewsSection } from '../components/common/ReviewsSection';
 import {
   ShieldCheck,
   Target,
@@ -210,7 +211,10 @@ export const AboutPage = () => {
         </div>
       </section>
 
-      {/* 4. CTA */}
+      {/* 4. CLIENT REVIEWS & TRANSFORMATIONS */}
+      <ReviewsSection className="pt-4" />
+
+      {/* 5. CTA */}
       <div className="glass-card rounded-3xl p-10 text-center border border-brand-accent/30 relative overflow-hidden">
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-3xl font-extrabold text-white">Transform With Kush Today</h2>

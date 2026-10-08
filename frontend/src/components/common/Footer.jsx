@@ -141,6 +141,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <a href="/#reviews" className="hover:text-brand-accent transition-colors">
+                  Client Reviews & Results
+                </a>
+              </li>
+              <li>
                 <Link to="/pricing" className="hover:text-brand-accent transition-colors">
                   Membership & Pricing
                 </Link>
