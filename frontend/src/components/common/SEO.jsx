@@ -6,6 +6,7 @@ const DEFAULT_IMAGE = `${SITE_URL}/assets/images/coach_kush.jpg`;
 export const SEO = ({
   title,
   description,
+  keywords,
   canonical,
   noindex = false,
   ogType = 'website',
@@ -54,6 +55,11 @@ export const SEO = ({
       setMetaTag('name', 'description', description);
     }
 
+    // 2b. Meta Keywords
+    if (keywords) {
+      setMetaTag('name', 'keywords', keywords);
+    }
+
     // 3. Canonical URL
     setLinkTag('canonical', cleanCanonical);
 
@@ -89,7 +95,7 @@ export const SEO = ({
     } else if (schemaScript) {
       schemaScript.remove();
     }
-  }, [title, description, canonical, noindex, ogType, ogImage, typeof schema === 'object' ? JSON.stringify(schema) : schema]);
+  }, [title, description, keywords, canonical, noindex, ogType, ogImage, typeof schema === 'object' ? JSON.stringify(schema) : schema]);
 
   return null;
 };

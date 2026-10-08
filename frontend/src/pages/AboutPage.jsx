@@ -4,6 +4,7 @@ import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { WhatsAppButton } from '../components/common/WhatsAppButton';
 import { SEO } from '../components/common/SEO';
+import { CertificationsMarquee, CERTIFICATIONS } from '../components/common/CertificationsMarquee';
 import {
   ShieldCheck,
   Target,
@@ -13,14 +14,18 @@ import {
   HeartPulse,
   Flame,
   ArrowRight,
+  GraduationCap,
+  Award,
+  Apple,
 } from 'lucide-react';
 
 export const AboutPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-24">
       <SEO
-        title="About Coach Kush | Kush Coach - Virtual Trainer & Online Coach | coachkush.in"
-        description="Learn about Coach Kush (Kush Coach), certified online fitness coach and virtual trainer based in Delhi NCR, delivering live 1-on-1 and couple coaching across India & worldwide on coachkush.in."
+        title="About Coach Kush | Certified Gym Trainer & Online Coach - Kush Trainer | coachkush.in"
+        description="Meet Coach Kush (Kush Trainer), certified gym trainer with K11 School of Fitness Sciences and ACE credentials. Live 1-on-1 virtual gym coaching and custom nutrition plans across India and globally."
+        keywords="gym, gym trainer, kush trainer, kush, gym trainer kush, coach kush gym trainer, certified gym trainer, ACE certified gym trainer, K11 gym trainer, online gym trainer, personal trainer Kush, gym workout coach, virtual gym trainer"
         canonical="/about"
       />
       {/* 1. Header */}
@@ -30,7 +35,7 @@ export const AboutPage = () => {
           About Coach Kush
         </h1>
         <p className="text-lg text-brand-muted leading-relaxed">
-          Pioneering high-accountability virtual coaching where every session is live, interactive, and tailored to your biomechanics. Based in Delhi NCR, training clients across India and globally.
+          Certified gym trainer and online fitness coach pioneering high-accountability virtual coaching where every session is live, interactive, and tailored to your biomechanics. Based in Delhi NCR, training clients across India and globally.
         </p>
 
         {/* Coach Kush Portrait Banner */}
@@ -38,7 +43,7 @@ export const AboutPage = () => {
           <div className="rounded-3xl overflow-hidden glass-card border border-brand-border shadow-2xl relative">
             <img
               src="/assets/images/coach_kush.jpg"
-              alt="Coach Kush - Online Fitness Coach and Certified Personal Trainer"
+              alt="Coach Kush - Certified Gym Trainer and Online Fitness Coach"
               width="600"
               height="450"
               className="w-full h-80 sm:h-96 object-cover object-top filter brightness-[0.95] contrast-[1.05]"
@@ -47,7 +52,7 @@ export const AboutPage = () => {
               <div className="flex justify-between items-center w-full">
                 <div>
                   <h3 className="text-xl font-bold text-white">Coach Kush</h3>
-                  <p className="text-xs text-brand-accent font-semibold">Head Coach & Founder, CoachKush</p>
+                  <p className="text-xs text-brand-accent font-semibold">Certified Gym Trainer & Founder, CoachKush</p>
                 </div>
                 <span className="text-xs font-bold text-brand-emerald bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-brand-emerald/30">
                   Google Meet & Zoom Certified
@@ -57,6 +62,9 @@ export const AboutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Moving Side-by-Side Credentials Marquee */}
+      <CertificationsMarquee showHeader={true} />
 
       {/* 2. Coach Philosophy */}
       <div className="glass-card rounded-3xl p-8 sm:p-14 border border-brand-border grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -151,6 +159,56 @@ export const AboutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 3.5. ACCREDITED CERTIFICATIONS DETAIL SECTION */}
+      <section className="space-y-10">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <Badge variant="accent">Professional Qualifications</Badge>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Accredited Certifications & Academic Credentials
+          </h2>
+          <p className="text-sm text-brand-muted leading-relaxed">
+            Every fitness protocol prescribed by Coach Kush is anchored in exercise science, functional anatomy, and evidence-based nutrition.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {CERTIFICATIONS.map((cert) => {
+            const Icon = cert.icon;
+            return (
+              <div
+                key={cert.id}
+                className="glass-card rounded-3xl p-6 sm:p-8 border border-blue-500/20 hover:border-blue-400/50 shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-300">
+                    <Icon className="w-6 h-6 stroke-[2.2]" />
+                  </div>
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
+                        {cert.title}
+                      </h3>
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                        {cert.badge}
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-brand-accent">
+                      {cert.subtitle}
+                    </p>
+                    <p className="text-xs text-blue-300/80 font-medium">
+                      {cert.institution}
+                    </p>
+                    <p className="text-xs sm:text-sm text-brand-muted leading-relaxed pt-2">
+                      {cert.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* 4. CTA */}
       <div className="glass-card rounded-3xl p-10 text-center border border-brand-accent/30 relative overflow-hidden">

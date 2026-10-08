@@ -27,6 +27,7 @@ import {
 import { motion } from 'framer-motion';
 import { FAQSection } from '../components/common/FAQSection';
 import { SEO } from '../components/common/SEO';
+import { CertificationsMarquee } from '../components/common/CertificationsMarquee';
 
 const DEFAULT_PLANS = [
   {
@@ -193,8 +194,9 @@ export const HomePage = () => {
   return (
     <div className="space-y-24 sm:space-y-36 pb-24 overflow-hidden">
       <SEO
-        title="Coach Kush | Kush Coach - Online Fitness Coach & Virtual Coaching | coachkush.in"
-        description="Coach Kush (Kush Coach) provides personalized online fitness coaching, live 1-on-1 virtual training, and couple coaching over Google Meet and Zoom. Transform your fitness with coachkush.in."
+        title="Coach Kush | Certified Gym Trainer & Online Fitness Coach - Kush Trainer | coachkush.in"
+        description="Transform your physique with Coach Kush (Kush Trainer). Live 1-on-1 virtual gym training, custom gym workout plans, and nutrition coaching over Google Meet and Zoom. Accredited by K11 & ACE."
+        keywords="gym, gym trainer, kush trainer, kush, gym trainer kush, coach kush gym trainer, online gym trainer, certified gym trainer, personal gym trainer, kush personal trainer, gym workout plans, virtual gym trainer, gym trainer in Delhi, online gym coach, kush fitness trainer"
         canonical="/"
       />
       {/* 1. HERO SECTION WITH COACH KUSH VISUAL */}
@@ -215,7 +217,7 @@ export const HomePage = () => {
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-brand-card/90 border border-brand-border shadow-lg">
                 <span className="w-2.5 h-2.5 rounded-full bg-brand-accent animate-pulse" />
                 <span className="text-xs font-bold text-white tracking-wide uppercase">
-                  1-on-1 & Couple Live Virtual Coaching
+                  Certified Gym Trainer • 1-on-1 & Couple Live Virtual Coaching
                 </span>
               </div>
 
@@ -225,7 +227,7 @@ export const HomePage = () => {
               </h1>
 
               <p className="text-base sm:text-lg text-brand-muted max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Train live on camera directly with Kush over <strong>Google Meet</strong> and <strong>Zoom</strong>. Precision biomechanics, instant posture corrections, progressive overload logging, and unmatched daily accountability.
+                Train live on camera directly with <strong>Kush (Certified Gym Trainer)</strong> over <strong>Google Meet</strong> and <strong>Zoom</strong>. Precision gym biomechanics, instant posture corrections, progressive overload logging, and unmatched daily accountability.
               </p>
 
               {/* Action Buttons */}
@@ -304,6 +306,9 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* CERTIFIED CREDENTIALS MARQUEE - MOVING SIDE BY SIDE */}
+      <CertificationsMarquee />
 
       {/* 2. COACH INTRODUCTION & PHILOSOPHY */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

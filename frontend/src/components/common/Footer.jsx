@@ -30,7 +30,7 @@ export const Footer = () => {
   const coachEmail = 'jeekush460@gmail.com';
   const tagline =
     settings?.footer_tagline ||
-    'Elite 1-on-1 and partner fitness coaching led directly by Kush. Delivering tailored body transformations, strength conditioning, and progressive overload tracking through live, interactive video coaching on Google Meet and Zoom.';
+    'Elite 1-on-1 and partner coaching led directly by certified gym trainer Coach Kush (Kush Trainer). Delivering tailored body transformations, strength conditioning, and progressive overload tracking through live, interactive video coaching on Google Meet and Zoom.';
   const copyright =
     settings?.footer_copyright ||
     'CoachKush. All rights reserved. Designed for elite performance & online accountability.';
@@ -110,6 +110,11 @@ export const Footer = () => {
               <span className="flex items-center gap-1.5">
                 <Video className="w-4 h-4 text-brand-accent" />
                 Live Video Coaching
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5 text-blue-400">
+                <ShieldCheck className="w-4 h-4" />
+                K11 & ACE Certified
               </span>
               <span>•</span>
               <span className="flex items-center gap-1.5">

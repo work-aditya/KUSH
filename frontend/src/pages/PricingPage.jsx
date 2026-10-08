@@ -61,8 +61,9 @@ export const PricingPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 space-y-16">
       <SEO
-        title="Plans & Pricing | Coach Kush & Kush Coach Online Fitness Packages | coachkush.in"
-        description="Explore online fitness coaching plans and pricing by Coach Kush (Kush Coach) on coachkush.in. Transparent rates for live 1-on-1 virtual training, couple workouts, and custom diet plans."
+        title="Plans & Pricing | Certified Gym Trainer Kush Packages | coachkush.in"
+        description="Explore coaching plans and pricing by certified gym trainer Coach Kush (Kush Trainer) on coachkush.in. Live 1-on-1 virtual gym training, couple workouts, and personalized diet plans."
+        keywords="gym trainer, kush trainer, kush, gym, gym trainer kush, coach kush gym trainer, certified gym trainer, personal gym trainer packages, gym workout plan, virtual gym trainer fees"
         canonical="/pricing"
       />
       {/* Header */}

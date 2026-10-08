@@ -9,14 +9,21 @@ export const FAQ_DATA = [
     category: 'training',
     question: 'How do the live virtual coaching sessions work?',
     answer:
-      'Every session is 100% live, private, and interactive via Google Meet or Zoom. Unlike pre-recorded apps or generic YouTube workouts, Coach Kush watches your repetitions in real time, provides immediate form correction, regulates rest periods, and pushes your intensity safely.',
+      'Every session is 100% live, private, and interactive via Google Meet or Zoom. Unlike pre-recorded apps or generic YouTube workouts, Coach Kush (certified gym trainer) watches your repetitions in real time, provides immediate form correction, regulates rest periods, and pushes your intensity safely.',
+  },
+  {
+    id: 'faq-credentials',
+    category: 'training',
+    question: 'What certifications does gym trainer Kush hold?',
+    answer:
+      'Coach Kush (Kush Trainer) is an accredited gym trainer holding APTPro + DPT (Diploma in Personal Training) and PT-SP (Personal Trainer in Special Populations) from K11 School of Fitness Sciences. He is an ACE Certified Personal Trainer (American Council on Exercise) and holds a B.Sc. degree in Nutrition & Dietetics.',
   },
   {
     id: 'faq-2',
     category: 'equipment',
     question: 'Do I need a commercial gym membership or expensive equipment?',
     answer:
-      'No! Kush tailors your exercise program entirely around your existing environment. Whether you train in a living room with bodyweight and resistance bands, have a pair of adjustable dumbbells, or train at a fully equipped commercial gym, the progressive overload is customized for you.',
+      'No! Certified gym trainer Kush tailors your program entirely around your setup. Whether you train at home with dumbbells and bands or workout at a commercial gym, Kush programs your custom gym workouts and corrects your form live.',
   },
   {
     id: 'faq-3',
