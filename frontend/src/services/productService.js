@@ -60,6 +60,35 @@ export const DEFAULT_FALLBACK_PRODUCTS = [
     ],
   },
   {
+    id: 'c03b0000-0000-0000-0000-000000000001',
+    _id: 'c03b0000-0000-0000-0000-000000000001',
+    name: 'Combos Offer (Customise Diet + Customise Workout)',
+    title: 'Combos Offer (Customise Diet + Customise Workout)',
+    slug: 'combo-diet-workout',
+    plan_type: 'single',
+    planType: 'single',
+    duration: '4 Weeks',
+    duration_months: 1,
+    sessions: 4,
+    price: 12999,
+    currency: 'INR',
+    sku: 'CK-COMBO-DIET-WORKOUT-4W',
+    highlighted: false,
+    description: 'Complete all-in-one transformation combo: tailored workout structure plus personalized nutrition plan with weekly check-ins and direct coach support.',
+    features: [
+      'Personalized custom diet plan',
+      'Tailored custom workout plan (Home / Gym)',
+      'Goal-based progressive training structure',
+      'Calorie & macro-based meal targets',
+      'Weekly diet & workout adjustments',
+      'Exercise form & video guidance cues',
+      'Vegetarian & Non-Vegetarian meal options',
+      'Injury & lifestyle limitation considerations',
+      'Meal timing & hydration guidance',
+      'Direct WhatsApp support with Kush',
+    ],
+  },
+  {
     id: 's12-single',
     _id: 'bfea34fa-02ce-409f-9227-a9dc6a40dfae',
     name: 'Session 12 - Single',
@@ -247,6 +276,16 @@ export const productService = {
         }
 
         const formatted = data.map(formatProductRecord);
+
+        // Ensure newly provisioned catalog items (e.g. combo packages) are included even if remote migration is in transit
+        const knownSlugs = new Set(formatted.map((p) => p.slug));
+        for (const fallbackPlan of DEFAULT_FALLBACK_PRODUCTS) {
+          if (!knownSlugs.has(fallbackPlan.slug)) {
+            formatted.push(fallbackPlan);
+          }
+        }
+        formatted.sort((a, b) => a.price - b.price);
+
         activePlansCache = formatted;
         activePlansCacheTimestamp = Date.now();
         return formatted;

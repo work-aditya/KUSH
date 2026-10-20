@@ -233,6 +233,8 @@ export const PricingPage = () => {
                     <Badge variant={isCouple ? 'emerald' : 'accent'}>
                       {isCouple
                         ? 'Couple / Partner'
+                        : plan.slug === 'combo-diet-workout'
+                        ? 'Combo Offer'
                         : plan.slug === 'diet-plan'
                         ? 'Diet & Nutrition'
                         : plan.slug === 'custom-workout-plan'
@@ -250,7 +252,9 @@ export const PricingPage = () => {
                     <div>
                       <h3 className="text-xl font-extrabold text-white">{plan.title}</h3>
                       <p className="text-xs font-medium text-brand-accent mt-0.5">
-                        {plan.slug === 'diet-plan'
+                        {plan.slug === 'combo-diet-workout'
+                          ? 'Custom Diet + Custom Workout'
+                          : plan.slug === 'diet-plan'
                           ? 'Customized Nutrition Plan'
                           : plan.slug === 'custom-workout-plan'
                           ? 'Tailored Workout Structure'

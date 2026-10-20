@@ -82,6 +82,31 @@ const DEFAULT_PLANS = [
     ],
   },
   {
+    _id: 'c03b0000-0000-0000-0000-000000000001',
+    id: 'c03b0000-0000-0000-0000-000000000001',
+    title: 'Combos Offer (Customise Diet + Customise Workout)',
+    name: 'Combos Offer (Customise Diet + Customise Workout)',
+    slug: 'combo-diet-workout',
+    duration: '4 Weeks',
+    sessions: 4,
+    planType: 'single',
+    price: 12999,
+    currency: 'INR',
+    description: 'Complete all-in-one transformation combo: tailored workout structure plus personalized nutrition plan with weekly check-ins and direct coach support.',
+    features: [
+      'Personalized custom diet plan',
+      'Tailored custom workout plan (Home / Gym)',
+      'Goal-based progressive training structure',
+      'Calorie & macro-based meal targets',
+      'Weekly diet & workout adjustments',
+      'Exercise form & video guidance cues',
+      'Vegetarian & Non-Vegetarian meal options',
+      'Injury & lifestyle limitation considerations',
+      'Meal timing & hydration guidance',
+      'Direct WhatsApp support with Kush',
+    ],
+  },
+  {
     _id: 'seed-1',
     id: 1,
     title: 'Session 12 - Single',
@@ -500,6 +525,8 @@ export const HomePage = () => {
                   <Badge variant={isCouple ? 'emerald' : 'accent'}>
                     {isCouple
                       ? 'Couple / Partner'
+                      : plan.slug === 'combo-diet-workout'
+                      ? 'Combo Offer'
                       : plan.slug === 'diet-plan'
                       ? 'Diet & Nutrition'
                       : plan.slug === 'custom-workout-plan'
@@ -517,7 +544,9 @@ export const HomePage = () => {
                   <div>
                     <h3 className="text-xl font-black text-white">{plan.title}</h3>
                     <p className="text-xs font-bold text-brand-accent mt-0.5">
-                      {plan.slug === 'diet-plan'
+                      {plan.slug === 'combo-diet-workout'
+                        ? 'Custom Diet + Custom Workout'
+                        : plan.slug === 'diet-plan'
                         ? 'Customized Nutrition Plan'
                         : plan.slug === 'custom-workout-plan'
                         ? 'Tailored Workout Structure'
